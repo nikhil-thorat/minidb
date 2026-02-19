@@ -43,4 +43,10 @@ Node *RemoveTail(List *list);
 */
 Node *RemoveNode(List *list, Node *node);
 
+/*
+  Delete's all the Nodes in the list and
+  Free's the memory occupied by them.
+*/
+void DestroyList(List *list);
+
 #endif
