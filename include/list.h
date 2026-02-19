@@ -41,6 +41,6 @@ Node *RemoveTail(List *list);
   Removes the given Node from the List.
   Returns a pointer deleted Node.
 */
-Node *RemoveNode(List *list);
+Node *RemoveNode(List *list, Node *node);
 
 #endif
