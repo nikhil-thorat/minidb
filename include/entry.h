@@ -1,7 +1,7 @@
 #ifndef ENTRY_H
 #define ENTRY_H
 
-#include "../include/node.h"
+#include "node.h"
 
 /*
   Represents the Slot status of the Entry

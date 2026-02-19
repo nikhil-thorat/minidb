@@ -1,7 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
-#include "../include/entry.h"
+#include "entry.h"
 
 /*
     Represents Map of entiries, contains capacity of the map,

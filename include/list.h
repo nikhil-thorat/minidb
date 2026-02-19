@@ -1,7 +1,7 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "../include/node.h"
+#include "node.h"
 
 /*
   Represents a Doubly linked list used for
