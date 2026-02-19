@@ -1,0 +1,29 @@
+#ifndef MAP_H
+#define MAP_H
+
+#include "../include/entry.h"
+
+/*
+    Represents Map of entiries, contains capacity of the map,
+    current size of the map and a pointer to an array of Entry struct
+*/
+typedef struct Map
+{
+    int capacity;
+    int size;
+    Entry *table;
+} Map;
+
+/*
+    Initializes a Map with specified capacity,
+    and returns a pointer to it.
+*/
+Map *CreateMap(int capacity);
+
+/*
+    Find's a Slot for the given key to be inserted
+    in the map
+*/
+int FindSlot(Map *map, const char *key);
+
+#endif
