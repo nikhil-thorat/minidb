@@ -5,8 +5,8 @@
 #include "map.h"
 
 /*
-  Represents a Database, which used Map and List for storing data,
-  Contains Map for sotring key and pointer to the Node in the List
+  Represents a Database, which uses Map and List for storing data,
+  Contains Map for storing key and pointer to the Node in the List
   and max_capacity and current_size.
  */
 typedef struct Database
@@ -18,8 +18,8 @@ typedef struct Database
 } Database;
 
 /*
-  Initialized a new Database with specified capacity,
-  and returns a pointer to the it.
+  Initializes a new Database with specified capacity.
+  Returns a pointer to the created Database.
  */
 Database *InitDatabase(int max_capacity);
 
@@ -30,13 +30,13 @@ void Set(Database *db, const char *key, const char *value);
 
 /*
   Return's the value of the given key if it exists
-  in the database.
+  in the Database.
 */
 char *Get(Database *db, const char *key);
 
 /*
   Delete's the key-value from the Database if it exits
-  in the database. Returns 1 if deleted, else 0
+  in the Database. Returns 1 if deleted, else 0
 */
 int Del(Database *db, const char *key);
 
@@ -45,6 +45,5 @@ int Del(Database *db, const char *key);
   occupied by it.
  */
 void DestroyDatabase(Database *db);
-
 
 #endif

@@ -15,14 +15,15 @@ typedef struct Map
 } Map;
 
 /*
-    Initializes a Map with specified capacity,
-    and returns a pointer to it.
+    Initializes a Map with specified capacity
+    Returns a pointer to the created Map.
 */
 Map *CreateMap(int capacity);
 
 /*
     Find's a Slot for the given key to be inserted
-    in the map
+    in the map.
+    Returns the Slot number for the key.
 */
 int FindSlot(Map *map, const char *key);
 

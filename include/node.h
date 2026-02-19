@@ -15,8 +15,8 @@ typedef struct Node
 } Node;
 
 /*
-  Creates a new Node with given key and value
-  and returns a pointer to it.
+  Creates a new Node with given key and value.
+  Returns a pointer to the created Node.
 */
 Node *NewNode(const char *key, const char *value);
 

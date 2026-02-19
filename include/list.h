@@ -16,12 +16,13 @@ typedef struct List
 } List;
 
 /*
-  Creates a new List and returns a poitner to it.
+  Creates a new List.
+  Returns a poitner to the created List.
  */
 List *NewList();
 
 /*
-  Adds the given Node to the front of the List.
+  Adds the given Node to the front of the List head.
 */
 void AddToHead(List *list, Node *node);
 
@@ -31,14 +32,14 @@ void AddToHead(List *list, Node *node);
 void MoveToHead(List *list, Node *node);
 
 /*
-  Removes the tail Node from the List, and
-  returns the deleted Node.
+  Removes the tail Node from the List.
+  Returns a pointer deleted Node.
 */
 Node *RemoveTail(List *list);
 
 /*
-  Removes the given Node from the List, and
-  returns the deleted Node.
+  Removes the given Node from the List.
+  Returns a pointer deleted Node.
 */
 Node *RemoveNode(List *list);
 
