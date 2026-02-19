@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra -pedantic
+CFLAGS = -std=c99 -Wall -Wextra -pedantic
 SRC = src/*.c
 TARGET = build/minidb
 
