@@ -2,10 +2,10 @@
 #define NODE_H
 
 /*
-  Represents a single Node, which contains
-  key and value and pointers to previous and
-  next node.
-*/
+ * Represents a single Node, which contains
+ * key and value and pointers to previous and
+ * next node.
+ */
 typedef struct Node
 {
     char *key;
@@ -15,14 +15,19 @@ typedef struct Node
 } Node;
 
 /*
-  Creates a new Node with given key and value.
-  Returns a pointer to the created Node.
-*/
+ * Creates a new Node with given key and value.
+ * Returns a pointer to the created Node.
+ */
 Node *NewNode(const char *key, const char *value);
 
 /*
-  Free's the memory occupied by the Node
-*/
+ * Updates the value of a give Node.
+ */
+void UpdateNodeValue(Node *node, const char *new_value);
+
+/*
+ * Free's the memory occupied by the Node
+ */
 void FreeNode(Node *node);
 
 #endif

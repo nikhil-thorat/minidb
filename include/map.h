@@ -4,10 +4,12 @@
 #include "entry.h"
 #include <stdlib.h>
 
+typedef struct Node Node;
+
 /*
-    Represents Map of entiries, contains capacity of the map,
-    current size of the map and a pointer to an array of Entry struct
-*/
+ * Represents Map of entiries, contains capacity of the map,
+ * current size of the map and a pointer to an array of Entry struct
+ */
 typedef struct Map
 {
     size_t capacity;
@@ -16,16 +18,34 @@ typedef struct Map
 } Map;
 
 /*
-    Initializes a Map with specified capacity
-    Returns a pointer to the created Map.
-*/
+ * Initializes a Map with specified capacity
+ * Returns a pointer to the created Map.
+ */
 Map *NewMap(size_t capacity);
 
 /*
-    Find's a Slot for the given key to be inserted
-    in the map.
-    Returns the Slot number for the key.
-*/
-int FindSlot(Map *map, const char *key);
+ * Sets the given key and value in the Map.
+ * Returns 1 if successfully inserted, 0 when
+ * key's value is updated, -1 when failed to
+ * Set the given key.
+ */
+int Set(Map *map, const char *key, Node *node);
+
+/*
+ * Returns the Node of the given
+ * key from the Map, else returns
+ * NULL if key is not found.
+ */
+Node *Get(Map *map, const char *key);
+
+/*
+ * Marks the slot of given key as DELETED
+ */
+void Delete(Map *map, const char *key);
+
+/*
+ * Frees the Maps internal table and the Map itself.
+ */
+void DestroyMap(Map *map);
 
 #endif

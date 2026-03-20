@@ -1,14 +1,15 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "node.h"
 #include <stdlib.h>
 
+typedef struct Node Node;
+
 /*
-  Represents a Doubly linked list used for
-  solving Eviction problem, contains pointers
-  to head and tail Node.
-*/
+ * Represents a Doubly linked list used for
+ * solving Eviction problem, contains pointers
+ * to head and tail Node.
+ */
 typedef struct List
 {
     Node *head;
@@ -17,37 +18,37 @@ typedef struct List
 } List;
 
 /*
-  Creates a new List.
-  Returns a poitner to the created List.
+ * Creates a new List.
+ * Returns a poitner to the created List.
  */
 List *NewList(void);
 
 /*
-  Adds the given Node to the front of the List head.
-*/
+ * Adds the given Node to the front of the List head.
+ */
 void AddToHead(List *list, Node *node);
 
 /*
-  Moves the given Node to the front of the List.
+ * Moves the given Node to the front of the List.
  */
 void MoveToHead(List *list, Node *node);
 
 /*
-  Removes the tail Node from the List.
-  Returns a pointer deleted Node.
-*/
+ * Removes the tail Node from the List.
+ * Returns a pointer deleted Node.
+ */
 Node *RemoveTail(List *list);
 
 /*
-  Removes the given Node from the List.
-  Returns a pointer deleted Node.
-*/
+ * Removes the given Node from the List.
+ * Returns a pointer deleted Node.
+ */
 Node *RemoveNode(List *list, Node *node);
 
 /*
-  Delete's all the Nodes in the list and
-  Free's the memory occupied by them.
-*/
+ * Delete's all the Nodes in the list and
+ * Free's the memory occupied by them.
+ */
 void DestroyList(List *list);
 
 #endif
