@@ -2,6 +2,7 @@
 #define MAP_H
 
 #include "entry.h"
+#include <stdlib.h>
 
 /*
     Represents Map of entiries, contains capacity of the map,
@@ -9,8 +10,8 @@
 */
 typedef struct Map
 {
-    int capacity;
-    int size;
+    size_t capacity;
+    size_t size;
     Entry *table;
 } Map;
 
@@ -18,7 +19,7 @@ typedef struct Map
     Initializes a Map with specified capacity
     Returns a pointer to the created Map.
 */
-Map *CreateMap(int capacity);
+Map *CreateMap(size_t capacity);
 
 /*
     Find's a Slot for the given key to be inserted

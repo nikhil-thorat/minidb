@@ -3,6 +3,7 @@
 
 #include "list.h"
 #include "map.h"
+#include <stdlib.h>
 
 /*
   Represents a Database, which uses Map and List for storing data,
@@ -13,15 +14,15 @@ typedef struct Database
 {
     Map *map;
     List *list;
-    int max_capacity;
-    int current_size;
+    size_t max_capacity;
+    size_t current_size;
 } Database;
 
 /*
   Initializes a new Database with specified capacity.
   Returns a pointer to the created Database.
  */
-Database *InitDatabase(int max_capacity);
+Database *InitDatabase(size_t max_capacity);
 
 /*
   Set's the given key and value in the Database.

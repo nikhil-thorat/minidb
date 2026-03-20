@@ -19,7 +19,7 @@ typedef struct List
   Creates a new List.
   Returns a poitner to the created List.
  */
-List *NewList();
+List *NewList(void);
 
 /*
   Adds the given Node to the front of the List head.
