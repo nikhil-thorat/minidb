@@ -7,9 +7,10 @@ void display_list(List *list)
     Node *node = list->head;
     while (node)
     {
-        printf("{%s = %s}", node->key, node->value);
-        if (node->next_node != NULL) {
-            printf("<=>");
+        printf("%s = %s", node->key, node->value);
+        if (node->next_node != NULL)
+        {
+            printf(" <=> ");
         }
         node = node->next_node;
     }
