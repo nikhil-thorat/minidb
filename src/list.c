@@ -1,4 +1,5 @@
 #include "../include/list.h"
+#include "../include/node.h"
 #include <stdlib.h>
 
 static Node *create_dummy_node(void)
@@ -28,9 +29,18 @@ List *NewList(void)
     list->head = create_dummy_node();
     list->tail = create_dummy_node();
 
+    if (list->head == NULL || list->tail == NULL)
+    {
+        if (list->head)
+            free(list->head);
+        if (list->tail)
+            free(list->tail);
+        free(list);
+        return NULL;
+    }
+
     list->head->next_node = list->tail;
     list->tail->prev_node = list->head;
-
     list->count = 0;
 
     return list;
@@ -66,6 +76,7 @@ void MoveToHead(List *list, Node *node)
     prev_node->next_node = next_node;
     next_node->prev_node = prev_node;
 
+    list->count--;
     AddToHead(list, node);
 }
 

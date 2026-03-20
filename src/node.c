@@ -19,6 +19,17 @@ Node *NewNode(const char *key, const char *value)
     return node;
 }
 
+void UpdateNodeValue(Node *node, const char *new_value)
+{
+    if (node == NULL || new_value == NULL)
+    {
+        return;
+    }
+
+    free(node->value);
+    node->value = strdup(new_value);
+}
+
 void FreeNode(Node *node)
 {
     if (node == NULL)
