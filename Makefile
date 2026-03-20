@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c99 -Wall -Wextra -pedantic -fsanitize=address
+CFLAGS = -std=c99 -Wall -Wextra -pedantic -fsanitize=address -D_POSIX_C_SOURCE=200809L
 SRC = src/*.c
 TARGET = build/minidb
 
