@@ -19,7 +19,7 @@ typedef struct Map
     Initializes a Map with specified capacity
     Returns a pointer to the created Map.
 */
-Map *CreateMap(size_t capacity);
+Map *NewMap(size_t capacity);
 
 /*
     Find's a Slot for the given key to be inserted

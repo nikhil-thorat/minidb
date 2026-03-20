@@ -22,7 +22,7 @@ typedef struct Database
   Initializes a new Database with specified capacity.
   Returns a pointer to the created Database.
  */
-Database *InitDatabase(size_t max_capacity);
+Database *NewDatabase(size_t max_capacity);
 
 /*
   Set's the given key and value in the Database.
