@@ -59,7 +59,7 @@ void test()
 
     DestroyList(list);
 
-    printf("ALL TESET PASSED : OK!\n");
+    puts("ALL TESET PASSED : OK!");
 }
 
 int main()
