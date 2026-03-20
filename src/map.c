@@ -78,15 +78,24 @@ int Set(Map *map, const char *key, Node *node)
         }
         else if (slot->status == OCCUPIED)
         {
-            Node *node = slot->node;
-            if (strcmp(node->key, key) == 0)
+            Node *existing_node = slot->node;
+            if (strcmp(existing_node->key, key) == 0)
             {
-                slot->node = node;
+                UpdateNodeValue(existing_node, node->value);
+                FreeNode(node);
                 return 0;
             }
         }
 
         index = (index + 1) % map->capacity;
+    }
+
+    if (first_deleted_index != -1)
+    {
+        map->table[first_deleted_index].node = node;
+        map->table[first_deleted_index].status = OCCUPIED;
+        map->size++;
+        return 1;
     }
 
     return -1;
@@ -110,7 +119,7 @@ Node *Get(Map *map, const char *key)
             Node *node = slot->node;
             if (strcmp(node->key, key) == 0)
             {
-                return slot->node;
+                return node;
             }
         }
 
