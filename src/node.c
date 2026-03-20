@@ -4,7 +4,7 @@
 
 Node *NewNode(const char *key, const char *value)
 {
-    Node *node = malloc(sizeof(Node));
+    Node *node = (Node *)malloc(sizeof(Node));
     if (node == NULL)
     {
         return NULL;
@@ -17,7 +17,7 @@ Node *NewNode(const char *key, const char *value)
     node->next_node = NULL;
 
     return node;
-};
+}
 
 void FreeNode(Node *node)
 {

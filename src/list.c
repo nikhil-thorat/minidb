@@ -1,13 +1,13 @@
 #include "../include/list.h"
 #include <stdlib.h>
 
-static Node *create_dummy_node()
+static Node *create_dummy_node(void)
 {
-    Node *dummy_node = malloc(sizeof(Node));
+    Node *dummy_node = (Node *)malloc(sizeof(Node));
     if (dummy_node == NULL)
     {
         return NULL;
-    }
+    };
 
     dummy_node->key = NULL;
     dummy_node->value = NULL;
@@ -15,15 +15,15 @@ static Node *create_dummy_node()
     dummy_node->next_node = NULL;
 
     return dummy_node;
-};
+}
 
-List *NewList()
+List *NewList(void)
 {
-    List *list = malloc(sizeof(List));
+    List *list = (List *)malloc(sizeof(List));
     if (list == NULL)
     {
         return NULL;
-    }
+    };
 
     list->head = create_dummy_node();
     list->tail = create_dummy_node();
@@ -34,14 +34,14 @@ List *NewList()
     list->count = 0;
 
     return list;
-};
+}
 
 void AddToHead(List *list, Node *node)
 {
     if (node == NULL)
     {
         return;
-    }
+    };
 
     Node *first_node = list->head->next_node;
 
@@ -59,7 +59,7 @@ void MoveToHead(List *list, Node *node)
     if (node == NULL)
     {
         return;
-    }
+    };
 
     Node *prev_node = node->prev_node;
     Node *next_node = node->next_node;
@@ -75,7 +75,7 @@ Node *RemoveTail(List *list)
     if (list->head->next_node == list->tail)
     {
         return NULL;
-    }
+    };
 
     Node *last_node = list->tail->prev_node;
     Node *prev_to_last = last_node->prev_node;
@@ -119,7 +119,7 @@ void DestroyList(List *list)
         Node *next_node = current_node->next_node;
         FreeNode(current_node);
         current_node = next_node;
-    }
+    };
 
     free(list);
 }
