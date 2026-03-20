@@ -2,6 +2,7 @@
 #define LIST_H
 
 #include "node.h"
+#include <stdlib.h>
 
 /*
   Represents a Doubly linked list used for
@@ -12,7 +13,7 @@ typedef struct List
 {
     Node *head;
     Node *tail;
-    int count;
+    size_t count;
 } List;
 
 /*
