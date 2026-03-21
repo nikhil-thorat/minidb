@@ -14,37 +14,37 @@ typedef struct Shard
 {
     Map *map;
     List *list;
-    size_t max_capacity;
-    size_t current_size;
+    size_t capacity;
+    size_t size;
 } Shard;
 
 /*
  * Initializes a new Shard with specified capacity.
  * Returns a pointer to the created Shard.
  */
-Shard *NewShard(size_t max_capacity);
+Shard *NewShard(size_t capacity);
 
 /*
  * Set's the given key and value in the Shard.
  */
-void Set(Shard *db, const char *key, const char *value);
+void ShardSet(Shard *shard, const char *key, const char *value);
 
 /*
  * Return's the value of the given key if it exists
  * in the Shard.
  */
-char *Get(Shard *db, const char *key);
+char *ShardGet(Shard *shard, const char *key);
 
 /*
  * Delete's the key-value from the Shard if it exits
  * in the Shard. Returns 1 if deleted, else 0
  */
-int Del(Shard *db, const char *key);
+int ShardDelete(Shard *shard, const char *key);
 
 /*
  * Delete's everything in the Shard and free's the memory
  * occupied by it.
  */
-void DestroyShard(Shard *db);
+void DestroyShard(Shard *shard);
 
 #endif

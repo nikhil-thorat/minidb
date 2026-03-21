@@ -29,19 +29,19 @@ Map *NewMap(size_t capacity);
  * key's value is updated, -1 when failed to
  * Set the given key.
  */
-int Set(Map *map, const char *key, Node *node);
+int MapSet(Map *map, const char *key, Node *node);
 
 /*
  * Returns the Node of the given
  * key from the Map, else returns
  * NULL if key is not found.
  */
-Node *Get(Map *map, const char *key);
+Node *MapGet(Map *map, const char *key);
 
 /*
  * Marks the slot of given key as DELETED
  */
-void Delete(Map *map, const char *key);
+void MapDelete(Map *map, const char *key);
 
 /*
  * Frees the Maps internal table and the Map itself.
