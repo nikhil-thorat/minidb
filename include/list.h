@@ -26,24 +26,24 @@ List *NewList(void);
 /*
  * Adds the given Node to the front of the List head.
  */
-void AddToHead(List *list, Node *node);
+void ListAddToHead(List *list, Node *node);
 
 /*
  * Moves the given Node to the front of the List.
  */
-void MoveToHead(List *list, Node *node);
+void ListMoveToHead(List *list, Node *node);
 
 /*
  * Removes the tail Node from the List.
  * Returns a pointer deleted Node.
  */
-Node *RemoveTail(List *list);
+Node *ListRemoveTail(List *list);
 
 /*
  * Removes the given Node from the List.
  * Returns a pointer deleted Node.
  */
-Node *RemoveNode(List *list, Node *node);
+Node *ListRemoveNode(List *list, Node *node);
 
 /*
  * Delete's all the Nodes in the list and

@@ -25,35 +25,35 @@ void test()
     assert(list->count == 0);
 
     Node *node1 = NewNode("foo", "bar");
-    AddToHead(list, node1);
+    ListAddToHead(list, node1);
     assert(node1 == list->head->next_node);
     assert(list->count == 1);
 
     Node *node2 = NewNode("bar", "foo");
-    AddToHead(list, node2);
+    ListAddToHead(list, node2);
     assert(node2 == list->head->next_node);
     assert(list->count == 2);
 
     display_list(list);
 
-    MoveToHead(list, node1);
+    ListMoveToHead(list, node1);
     display_list(list);
     assert(node1 == list->head->next_node);
     assert(list->count == 2);
 
-    Node *removed_tail = RemoveTail(list);
+    Node *removed_tail = ListRemoveTail(list);
     assert(removed_tail == node2);
     assert(list->count == 1);
     display_list(list);
     FreeNode(removed_tail);
 
-    Node *removed_node = RemoveNode(list, node1);
+    Node *removed_node = ListRemoveNode(list, node1);
     assert(removed_node == node1);
     assert(list->count == 0);
     assert(list->head->next_node == list->tail);
     FreeNode(removed_node);
 
-    Node *empty_tail = RemoveTail(list);
+    Node *empty_tail = ListRemoveTail(list);
     assert(empty_tail == NULL);
     assert(list->count == 0);
 
