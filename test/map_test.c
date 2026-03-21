@@ -22,48 +22,48 @@ void test()
 
     Node *nodeA_updated = NewNode("A", "ValueAUpdated");
 
-    int res = Set(map, "A", nodeA);
+    int res = MapSet(map, "A", nodeA);
     assert(res == 1);
     assert(map->size == 1);
 
-    Node *found = Get(map, "A");
+    Node *found = MapGet(map, "A");
     assert(found == nodeA);
     assert(strcmp(found->value, "ValueA") == 0);
 
-    res = Set(map, "A", nodeA_updated);
+    res = MapSet(map, "A", nodeA_updated);
     assert(res == 0);
     assert(map->size == 1);
 
-    found = Get(map, "A");
+    found = MapGet(map, "A");
     assert(found == nodeA);
     assert(strcmp(found->value, "ValueAUpdated") == 0);
 
-    found = Get(map, "Z");
+    found = MapGet(map, "Z");
     assert(found == NULL);
 
-    Set(map, "B", nodeB);
-    Set(map, "C", nodeC);
-    Set(map, "D", nodeD);
-    Set(map, "E", nodeE);
+    MapSet(map, "B", nodeB);
+    MapSet(map, "C", nodeC);
+    MapSet(map, "D", nodeD);
+    MapSet(map, "E", nodeE);
     assert(map->size == 5);
 
     Node *nodeF = NewNode("F", "ValueF");
-    res = Set(map, "F", nodeF);
+    res = MapSet(map, "F", nodeF);
     assert(res == -1);
     assert(map->size == 5);
 
-    Delete(map, "C");
+    MapDelete(map, "C");
     assert(map->size == 4);
-    found = Get(map, "C");
+    found = MapGet(map, "C");
     assert(found == NULL);
 
-    found = Get(map, "E");
+    found = MapGet(map, "E");
     assert(found == nodeE);
 
-    res = Set(map, "F", nodeF);
+    res = MapSet(map, "F", nodeF);
     assert(res == 1);
     assert(map->size == 5);
-    found = Get(map, "F");
+    found = MapGet(map, "F");
     assert(found == nodeF);
 
     DestroyMap(map);

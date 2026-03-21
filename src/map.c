@@ -39,7 +39,7 @@ Map *NewMap(size_t capacity)
     return new_map;
 }
 
-int Set(Map *map, const char *key, Node *node)
+int MapSet(Map *map, const char *key, Node *node)
 {
     if (map->size >= map->capacity)
     {
@@ -101,7 +101,7 @@ int Set(Map *map, const char *key, Node *node)
     return -1;
 }
 
-Node *Get(Map *map, const char *key)
+Node *MapGet(Map *map, const char *key)
 {
 
     uint32_t index = HashString(key) % map->capacity;
@@ -129,7 +129,7 @@ Node *Get(Map *map, const char *key)
     return NULL;
 }
 
-void Delete(Map *map, const char *key)
+void MapDelete(Map *map, const char *key)
 {
     uint32_t index = HashString(key) % map->capacity;
 
