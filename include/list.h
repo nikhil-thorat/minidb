@@ -14,7 +14,7 @@ typedef struct List
 {
     Node *head;
     Node *tail;
-    size_t count;
+    size_t size;
 } List;
 
 /*

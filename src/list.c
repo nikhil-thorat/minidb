@@ -41,7 +41,7 @@ List *NewList(void)
 
     list->head->next_node = list->tail;
     list->tail->prev_node = list->head;
-    list->count = 0;
+    list->size = 0;
 
     return list;
 }
@@ -61,7 +61,7 @@ void ListAddToHead(List *list, Node *node)
     node->next_node = first_node;
     first_node->prev_node = node;
 
-    list->count++;
+    list->size++;
 }
 
 void ListMoveToHead(List *list, Node *node)
@@ -76,7 +76,7 @@ void ListMoveToHead(List *list, Node *node)
     prev_node->next_node = next_node;
     next_node->prev_node = prev_node;
 
-    list->count--;
+    list->size--;
     ListAddToHead(list, node);
 }
 
@@ -97,7 +97,7 @@ Node *ListRemoveTail(List *list)
     last_node->prev_node = NULL;
     last_node->next_node = NULL;
 
-    list->count--;
+    list->size--;
 
     return last_node;
 }
@@ -117,7 +117,7 @@ Node *ListRemoveNode(List *list, Node *node)
     node->prev_node = NULL;
     node->next_node = NULL;
 
-    list->count--;
+    list->size--;
 
     return node;
 }
