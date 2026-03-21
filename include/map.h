@@ -41,7 +41,7 @@ Node *MapGet(Map *map, const char *key);
 /*
  * Marks the slot of given key as DELETED
  */
-void MapDelete(Map *map, const char *key);
+Node *MapDelete(Map *map, const char *key);
 
 /*
  * Frees the Maps internal table and the Map itself.

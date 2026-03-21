@@ -129,7 +129,7 @@ Node *MapGet(Map *map, const char *key)
     return NULL;
 }
 
-void MapDelete(Map *map, const char *key)
+Node *MapDelete(Map *map, const char *key)
 {
     uint32_t index = HashString(key) % map->capacity;
 
@@ -139,7 +139,7 @@ void MapDelete(Map *map, const char *key)
 
         if (slot->status == EMPTY)
         {
-            return;
+            return NULL;
         }
         else if (slot->status == OCCUPIED)
         {
@@ -148,12 +148,13 @@ void MapDelete(Map *map, const char *key)
             {
                 slot->status = DELETED;
                 map->size--;
-                return;
+                return node;
             }
         }
 
         index = (index + 1) % map->capacity;
     }
+    return NULL;
 }
 
 void DestroyMap(Map *map)
