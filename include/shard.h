@@ -8,7 +8,7 @@
 /*
  * Represents a Shard, which uses Map and List for storing data,
  * Contains Map for storing key and pointer to the Node in the List
- * and max_capacity and current_size.
+ * and capacity and size.
  */
 typedef struct Shard
 {
@@ -26,12 +26,13 @@ Shard *NewShard(size_t capacity);
 
 /*
  * Set's the given key and value in the Shard.
+ * Returns 1 if successful, else 0
  */
-void ShardSet(Shard *shard, const char *key, const char *value);
+int ShardSet(Shard *shard, const char *key, const char *value);
 
 /*
- * Return's the value of the given key if it exists
- * in the Shard.
+ * Return's the pointer to the value of the given
+ * key if it exists in the Shard.
  */
 char *ShardGet(Shard *shard, const char *key);
 
