@@ -1,5 +1,6 @@
 #include "../include/list.h"
 #include "../include/node.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 static Node *create_dummy_node(void)
@@ -16,6 +17,18 @@ static Node *create_dummy_node(void)
     dummy_node->next_node = NULL;
 
     return dummy_node;
+}
+
+static void unlink_node(Node *node)
+{
+    Node *prev = node->prev_node;
+    Node *next = node->next_node;
+
+    prev->next_node = next;
+    next->prev_node = prev;
+
+    node->next_node = NULL;
+    node->prev_node = NULL;
 }
 
 List *NewList(void)
@@ -55,10 +68,10 @@ void ListAddToHead(List *list, Node *node)
 
     Node *first_node = list->head->next_node;
 
-    list->head->next_node = node;
     node->prev_node = list->head;
-
     node->next_node = first_node;
+
+    list->head->next_node = node;
     first_node->prev_node = node;
 
     list->size++;
@@ -71,12 +84,9 @@ void ListMoveToHead(List *list, Node *node)
         return;
     };
 
-    Node *prev_node = node->prev_node;
-    Node *next_node = node->next_node;
-    prev_node->next_node = next_node;
-    next_node->prev_node = prev_node;
-
+    unlink_node(node);
     list->size--;
+
     ListAddToHead(list, node);
 }
 
@@ -89,14 +99,8 @@ Node *ListRemoveTail(List *list)
     };
 
     Node *last_node = list->tail->prev_node;
-    Node *prev_to_last = last_node->prev_node;
 
-    list->tail->prev_node = prev_to_last;
-    prev_to_last->next_node = list->tail;
-
-    last_node->prev_node = NULL;
-    last_node->next_node = NULL;
-
+    unlink_node(last_node);
     list->size--;
 
     return last_node;
@@ -109,14 +113,7 @@ Node *ListRemoveNode(List *list, Node *node)
         return NULL;
     }
 
-    Node *prev_node = node->prev_node;
-    Node *next_node = node->next_node;
-    next_node->prev_node = prev_node;
-    prev_node->next_node = next_node;
-
-    node->prev_node = NULL;
-    node->next_node = NULL;
-
+    unlink_node(node);
     list->size--;
 
     return node;
