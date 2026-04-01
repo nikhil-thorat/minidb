@@ -5,17 +5,7 @@
 
 static Node *create_dummy_node(void)
 {
-    Node *dummy_node = (Node *)malloc(sizeof(Node));
-    if (dummy_node == NULL)
-    {
-        return NULL;
-    };
-
-    dummy_node->key = NULL;
-    dummy_node->value = NULL;
-    dummy_node->prev_node = NULL;
-    dummy_node->next_node = NULL;
-
+    Node *dummy_node = (Node *)calloc(1, sizeof(Node));
     return dummy_node;
 }
 
@@ -121,13 +111,11 @@ Node *ListRemoveNode(List *list, Node *node)
 
 void DestroyList(List *list)
 {
-    Node *current_node = list->head;
-    while (current_node != NULL)
+    if (list == NULL)
     {
-        Node *next_node = current_node->next_node;
-        FreeNode(current_node);
-        current_node = next_node;
-    };
-
+        return;
+    }
+    free(list->head);
+    free(list->tail);
     free(list);
 }

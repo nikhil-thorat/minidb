@@ -16,6 +16,9 @@ typedef struct Shard
     List *list;
     size_t capacity;
     size_t size;
+
+    Node *node_pool;
+    Node *free_list;
 } Shard;
 
 /*

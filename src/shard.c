@@ -1,6 +1,8 @@
 #include "../include/shard.h"
 #include "../include/node.h"
+#include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 Shard *NewShard(size_t capacity)
 {
@@ -13,7 +15,9 @@ Shard *NewShard(size_t capacity)
     Map *map = NewMap(capacity * 2);
     List *list = NewList();
 
-    if (map == NULL || list == NULL)
+    Node *pool = (Node *)malloc(sizeof(Node) * capacity);
+
+    if (map == NULL || list == NULL || pool == NULL)
     {
         if (map != NULL)
         {
@@ -23,6 +27,10 @@ Shard *NewShard(size_t capacity)
         {
             DestroyList(shard->list);
         }
+        if (pool != NULL)
+        {
+            free(pool);
+        }
         free(shard);
         return NULL;
     }
@@ -31,6 +39,14 @@ Shard *NewShard(size_t capacity)
     shard->size = 0;
     shard->map = map;
     shard->list = list;
+    shard->node_pool = pool;
+
+    for (size_t i = 0; i < capacity; i++)
+    {
+        pool[i].next_node = &pool[i + 1];
+    }
+    pool[capacity - 1].next_node = NULL;
+    shard->free_list = &pool[0];
 
     return shard;
 }
@@ -45,36 +61,38 @@ int ShardSet(Shard *shard, const char *key, const char *value)
     Node *existing_node = MapGet(shard->map, key);
     if (existing_node != NULL)
     {
-        int result = UpdateNodeValue(existing_node, value);
-        if (result == 1)
-        {
-            ListMoveToHead(shard->list, existing_node);
-            return 0;
-        }
+        UpdateNodeValue(existing_node, value);
+        ListMoveToHead(shard->list, existing_node);
         return 0;
     }
 
     if (shard->size >= shard->capacity)
     {
         Node *deleted_node = ListRemoveTail(shard->list);
-        deleted_node = MapDelete(shard->map, deleted_node->key);
         if (deleted_node != NULL)
         {
-            FreeNode(deleted_node);
+            MapDelete(shard->map, deleted_node->key);
+            deleted_node->next_node = shard->free_list;
+            shard->free_list = deleted_node;
             shard->size--;
         }
     }
 
-    Node *node = NewNode(key, value);
-    if (node == NULL)
+    if (shard->free_list == NULL)
     {
         return 0;
     }
 
+    Node *node = shard->free_list;
+    shard->free_list = node->next_node;
+
+    InitializeNode(node, key, value);
+
     int result = MapSet(shard->map, key, node);
     if (result == -1)
     {
-        FreeNode(node);
+        node->next_node = shard->free_list;
+        shard->free_list = node;
         return 0;
     }
 
@@ -119,7 +137,8 @@ int ShardDelete(Shard *shard, const char *key)
         return 0;
     }
 
-    FreeNode(deleted_node);
+    deleted_node->next_node = shard->free_list;
+    shard->free_list = deleted_node;
     shard->size--;
     return 1;
 }
@@ -133,5 +152,6 @@ void DestroyShard(Shard *shard)
 
     DestroyMap(shard->map);
     DestroyList(shard->list);
+    free(shard->node_pool);
     free(shard);
 }

@@ -1,30 +1,21 @@
 #include "../include/node.h"
-#include <stdlib.h>
 #include <string.h>
 
-Node *NewNode(const char *key, const char *value)
+void InitializeNode(Node *node, const char *key, const char *value)
 {
-    Node *node = (Node *)malloc(sizeof(Node));
     if (node == NULL)
     {
-        return NULL;
+        return;
     }
 
-    node->key = strdup(key);
-    node->value = strdup(value);
+    strncpy(node->key, key, MAX_KEY_LEN - 1);
+    node->key[MAX_KEY_LEN - 1] = '\0';
 
-    if (node->key == NULL || node->value == NULL)
-    {
-        free(node->key);
-        free(node->value);
-        free(node);
-        return NULL;
-    }
+    strncpy(node->value, value, MAX_VALUE_LEN - 1);
+    node->value[MAX_VALUE_LEN - 1] = '\0';
 
     node->prev_node = NULL;
     node->next_node = NULL;
-
-    return node;
 }
 
 int UpdateNodeValue(Node *node, const char *new_value)
@@ -34,25 +25,8 @@ int UpdateNodeValue(Node *node, const char *new_value)
         return 0;
     }
 
-    char *temp_value = strdup(new_value);
-    if (temp_value == NULL)
-    {
-        return 0;
-    }
-
-    free(node->value);
-    node->value = temp_value;
+    strncpy(node->value, new_value, MAX_VALUE_LEN - 1);
+    node->value[MAX_VALUE_LEN - 1] = '\0';
 
     return 1;
-}
-
-void FreeNode(Node *node)
-{
-    if (node == NULL)
-    {
-        return;
-    }
-    free(node->key);
-    free(node->value);
-    free(node);
 }
