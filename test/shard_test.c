@@ -11,7 +11,7 @@ void test_million_keys()
     assert(shard->size == 0);
     assert(shard->capacity == capacity);
 
-    int total_operations = 1000000;
+    int total_operations = 10000000;
     char value[] = "million_test_value";
 
     for (int i = 0; i < total_operations; i++)
@@ -69,7 +69,7 @@ void test()
         char key[20];
         snprintf(key, sizeof(key), "%d", i);
         char *result = ShardGet(shard, key);
-        assert(result != value);
+        assert(strcmp(result, value) == 0);
     }
 
     for (int i = 0; i < capacity; i++)
@@ -82,6 +82,7 @@ void test()
 
     assert(shard->size == 0);
 
+    DestroyShard(shard);
     printf("ALL TEST PASSED\n");
 }
 
