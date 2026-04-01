@@ -13,21 +13,37 @@ Node *NewNode(const char *key, const char *value)
     node->key = strdup(key);
     node->value = strdup(value);
 
+    if (node->key == NULL || node->value == NULL)
+    {
+        free(node->key);
+        free(node->value);
+        free(node);
+        return NULL;
+    }
+
     node->prev_node = NULL;
     node->next_node = NULL;
 
     return node;
 }
 
-void UpdateNodeValue(Node *node, const char *new_value)
+int UpdateNodeValue(Node *node, const char *new_value)
 {
     if (node == NULL || new_value == NULL)
     {
-        return;
+        return 0;
+    }
+
+    char *temp_value = strdup(new_value);
+    if (temp_value == NULL)
+    {
+        return 0;
     }
 
     free(node->value);
-    node->value = strdup(new_value);
+    node->value = temp_value;
+
+    return 1;
 }
 
 void FreeNode(Node *node)

@@ -21,9 +21,10 @@ typedef struct Node
 Node *NewNode(const char *key, const char *value);
 
 /*
- * Updates the value of a give Node.
+ * Updates the value of a give Node. Returns 1 if
+ * updates successfully else 0.
  */
-void UpdateNodeValue(Node *node, const char *new_value);
+int UpdateNodeValue(Node *node, const char *new_value);
 
 /*
  * Free's the memory occupied by the Node
