@@ -28,10 +28,11 @@ Database *NewDatabase(size_t num_shards, size_t shard_capacity)
         {
             for (size_t j = 0; j < i; j++)
             {
-                free(db->shards);
-                free(db);
-                return NULL;
+                DestroyShard(db->shards[j]);
             }
+            free(db->shards);
+            free(db);
+            return NULL;
         }
     }
 
@@ -46,7 +47,7 @@ int DatabaseSet(Database *db, const char *key, const char *value)
     }
 
     uint32_t hash = Hash(key);
-    size_t shard_index = hash % (db->num_shards - 1);
+    size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardSet(db->shards[shard_index], key, value);
 };
@@ -56,11 +57,11 @@ char *DatabaseGet(Database *db, const char *key)
 
     if (db == NULL || key == NULL)
     {
-        return 0;
+        return NULL;
     }
 
     uint32_t hash = Hash(key);
-    size_t shard_index = hash % (db->num_shards - 1);
+    size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardGet(db->shards[shard_index], key);
 };
@@ -73,7 +74,7 @@ int DatabaseDelete(Database *db, const char *key)
     }
 
     uint32_t hash = Hash(key);
-    size_t shard_index = hash % (db->num_shards - 1);
+    size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardDelete(db->shards[shard_index], key);
 };
