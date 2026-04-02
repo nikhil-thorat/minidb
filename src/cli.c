@@ -88,11 +88,11 @@ void run_performance_test(void)
 
     Database *test_db = NewDatabase(16, 65536);
 
-    clock_t start = clock();
     char key[32];
     char value[] = "performance test value";
 
     puts("Checking Insertion Performance");
+    clock_t start = clock();
     int operations = 50000000;
     for (int i = 0; i < operations; i++)
     {
@@ -109,6 +109,7 @@ void run_performance_test(void)
     puts("Checking Querying Performance");
     int cache_hits = 0;
 
+    start = clock();
     for (int i = 49000000; i < 99000000; i++)
     {
         fast_itoa(i, key);
@@ -119,11 +120,16 @@ void run_performance_test(void)
         }
     }
 
+    clock_t query_time = clock();
+    time_spent = (double)(query_time - start) / CLOCKS_PER_SEC;
+
     puts("Querying Completed : OK!");
     printf("Time: %.3f seconds | Speed: %.0f OPS\n", time_spent, operations / time_spent);
     printf("(Cache Hits: %d)\n\n", cache_hits);
 
     puts("Checking Real-world Performance");
+    operations = 20000000;
+    start = clock();
     for (int i = 0; i < operations; i++)
     {
         fast_itoa(i, key);
@@ -142,9 +148,6 @@ void run_performance_test(void)
             DatabaseDelete(test_db, key);
         }
     }
-
-    clock_t query_time = clock();
-    time_spent = (double)(query_time - start) / CLOCKS_PER_SEC;
 
     clock_t end = clock();
     time_spent = (double)(end - start) / CLOCKS_PER_SEC;
