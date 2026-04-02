@@ -35,7 +35,7 @@ char *DatabaseGet(Database *db, const char *key);
  * Delete's the key-value from the Database if it exits
  * in the Database. Returns 1 if deleted, else 0.
  */
-int DatabaseDel(Database *db, const char *key);
+int DatabaseDelete(Database *db, const char *key);
 
 /*
  * Delete's everything in the Database and free's the memory
