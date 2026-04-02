@@ -63,7 +63,7 @@ int ShardSet(Shard *shard, const char *key, const char *value)
     {
         UpdateNodeValue(existing_node, value);
         ListMoveToHead(shard->list, existing_node);
-        return 0;
+        return 1;
     }
 
     if (shard->size >= shard->capacity)

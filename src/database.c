@@ -50,7 +50,7 @@ int DatabaseSet(Database *db, const char *key, const char *value)
     size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardSet(db->shards[shard_index], key, value);
-};
+}
 
 char *DatabaseGet(Database *db, const char *key)
 {
@@ -64,7 +64,7 @@ char *DatabaseGet(Database *db, const char *key)
     size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardGet(db->shards[shard_index], key);
-};
+}
 
 int DatabaseDelete(Database *db, const char *key)
 {
@@ -77,7 +77,7 @@ int DatabaseDelete(Database *db, const char *key)
     size_t shard_index = hash & (db->num_shards - 1);
 
     return ShardDelete(db->shards[shard_index], key);
-};
+}
 
 void DestroyDatabase(Database *db)
 {
