@@ -25,7 +25,7 @@ Building a database from scratch revealed that theoretical code doesn't always t
 * **The Problem:** The standard **FNV-1a** hashing algorithm processed strings one byte at a time, and calculating array indexes using modulo division (`%`) was wasting valuable CPU cycles.
 * **The Solution:** I upgraded the hashing engine to **MurmurHash3** (processing data in 32-bit chunks) and replaced the slow division operator with a lightning-fast **Bitwise AND (`&`)** mask, enforcing a strict power-of-two capacity rule.
 
-### 3. Tombstone Pollution (The 4-Billion Loop Bug)
+### 3. Tombstone Pollution (The Wasted Loops Bug)
 * **The Problem:** When the cache filled up, the LRU eviction policy worked, but it left "Deleted" markers (tombstones) everywhere. Eventually, the database had to loop through thousands of dead spots just to find a single key.
 * **The Solution:** I implemented a **Garbage Collection (Rehashing)** system. Whenever a shard reaches 75% capacity of active and dead data, it briefly pauses, creates a clean table, moves only the active keys, and wipes the garbage to guarantee $O(1)$ lookups.
 
@@ -37,7 +37,7 @@ Building a database from scratch revealed that theoretical code doesn't always t
 
 Because MiniDB operates as an embedded engine (bypassing the TCP/IP network tax) and utilizes aggressive memory pooling, it hits maximum hardware speeds.
 
-Compiled with Clang (`-O3 -march=native -flto`), a standard stress test **Writing/Reading 50 Million key-value pairs* yields:
+Compiled with Clang (`-O3 -march=native -flto`), a standard stress test **Writing/Reading 50 Million key-value pairs** yields:
 * **Writes (Inserts):** ~1.2 Million Operations Per Second (OPS)
 * **Reads (Lookups):** ~2.8 Million Operations Per Second (OPS)
 
@@ -47,7 +47,7 @@ Compiled with Clang (`-O3 -march=native -flto`), a standard stress test **Writin
 * **Custom REPL CLI:** A blazing fast interactive command-line interface with built-in profiling.
 * **$O(1)$ LRU Eviction:** Automatically drops the oldest data when capacity is reached via a sentinelled Doubly Linked List.
 * **Thread-Safe Routing:** Uses `strtok_r` and independent shards to ensure clean data parsing.
-* **Zero Dependencies:** Built using standard *POSIX C*. No external libraries required.
+* **Zero Dependencies:** Built using standard **POSIX C**. No external libraries required.
 
 ## Building and Running
 
@@ -65,5 +65,5 @@ make build
 ./build/minidb
 ```
 
-Once inside the CLI, type `performance` to watch the database run a 50 Million key stress test in real-time.
-*(Test results can vary from hardware to hardware).*
+Once inside the CLI, type `performance` to watch the database run a *50 Million key stress test* in real-time.
+**(Note : Test results can vary from hardware to hardware).**
