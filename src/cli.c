@@ -4,6 +4,17 @@
 #include <string.h>
 #include <time.h>
 
+#define SET "set"
+#define GET "get"
+#define DEL "del"
+#define HELP "help"
+#define CLEAR "clear"
+#define CLS "cls"
+#define EXIT "exit"
+#define QUIT "quit"
+#define STATUS "status"
+#define PERFORMANCE "performance"
+
 static inline void fast_itoa(int val, char *buf)
 {
     if (val == 0)
@@ -44,13 +55,13 @@ void print_help(void)
 {
     puts("");
     puts("Avaliable Commands : ");
-    puts("\tset key value\t\t : Store a key-value pair");
-    puts("\tget key \t\t : Retrieve a value by key");
-    puts("\tdel value\t\t : Delete a key-value pair");
-    puts("\tcheck status\t\t : Check the database health and capacity");
-    puts("\tcheck performance\t : Check the database performance");
-    puts("\tclear or cls\t\t : Clear the terminal screen");
-    puts("\texit or quit\t\t : Quit the program");
+    puts("set key value          : Store a key-value pair");
+    puts("get key                : Retrieve a value by key");
+    puts("del value              : Delete a key-value pair");
+    puts("status                 : Check the database health and capacity");
+    puts("performance            : Check the database performance");
+    puts("clear or cls           : Clear the terminal screen");
+    puts("exit or quit           : Quit the program");
     puts("");
 }
 
@@ -84,14 +95,14 @@ void check_db_status(Database *db)
 void run_performance_test(void)
 {
     puts("");
-    puts("Starting Performance Test");
+    puts("Starting Performance Test...");
 
     Database *test_db = NewDatabase(16, 65536);
 
     char key[32];
     char value[] = "performance test value";
 
-    puts("Checking Insertion Performance");
+    puts("Testing Insertion Performance");
     clock_t start = clock();
     int operations = 50000000;
     for (int i = 0; i < operations; i++)
@@ -103,10 +114,12 @@ void run_performance_test(void)
     clock_t insert_time = clock();
     double time_spent = (double)(insert_time - start) / CLOCKS_PER_SEC;
 
-    puts("Insertion Completed : OK!");
-    printf("Time: %.3f seconds | Speed: %.0f OPS\n\n", time_spent, operations / time_spent);
+    puts("Insertion Test Completed : OK!");
+    printf("Time Taken : %.3f seconds for %d operations\n", time_spent, operations);
+    printf("Operations Speed : %.0f operations per second\n", operations / time_spent);
+    puts("");
 
-    puts("Checking Querying Performance");
+    puts("Testing Querying Performance");
     int cache_hits = 0;
 
     start = clock();
@@ -123,11 +136,13 @@ void run_performance_test(void)
     clock_t query_time = clock();
     time_spent = (double)(query_time - start) / CLOCKS_PER_SEC;
 
-    puts("Querying Completed : OK!");
-    printf("Time: %.3f seconds | Speed: %.0f OPS\n", time_spent, operations / time_spent);
-    printf("(Cache Hits: %d)\n\n", cache_hits);
+    puts("Querying Test Completed : OK!");
+    printf("Time Taken : %.3f seconds for %d operations\n", time_spent, operations);
+    printf("Operations Speed : %.0f operations per second\n", operations / time_spent);
+    printf("(Cache Hits: %d)\n", cache_hits);
+    puts("");
 
-    puts("Checking Real-world Performance");
+    puts("Testing Real-world Performance");
     operations = 20000000;
     start = clock();
     for (int i = 0; i < operations; i++)
@@ -171,44 +186,36 @@ void handle_command(Cli *cli, char *input)
         return;
     }
 
-    if (strcmp(cmd, "exit") == 0 || strcmp(cmd, "quit") == 0)
+    if (strcmp(cmd, EXIT) == 0 || strcmp(cmd, QUIT) == 0)
     {
         puts("Shutting down Database...");
         DestroyDatabase(cli->db);
         exit(EXIT_SUCCESS);
     }
-    else if (strcmp(cmd, "help") == 0)
+    else if (strcmp(cmd, HELP) == 0)
     {
         print_help();
     }
-    else if (strcmp(cmd, "clear") == 0 || strcmp(cmd, "cls") == 0)
+    else if (strcmp(cmd, CLEAR) == 0 || strcmp(cmd, CLS) == 0)
     {
         clear_screen();
     }
-    else if (strcmp(cmd, "check") == 0)
+    else if (strcmp(cmd, PERFORMANCE) == 0)
     {
-        char *sub_cmd = strtok_r(NULL, " \n\r", &saved_ptr);
-        if (sub_cmd != NULL && strcmp(sub_cmd, "performance") == 0)
-        {
-            run_performance_test();
-        }
-        else if (sub_cmd != NULL && strcmp(sub_cmd, "status") == 0)
-        {
-            check_db_status(cli->db);
-        }
-        else
-        {
-            puts("[ERROR] Unknown check command");
-        }
+        run_performance_test();
     }
-    else if (strcmp(cmd, "set") == 0)
+    else if (strcmp(cmd, STATUS) == 0)
+    {
+        check_db_status(cli->db);
+    }
+    else if (strcmp(cmd, SET) == 0)
     {
         char *key = strtok_r(NULL, " \n\r", &saved_ptr);
         char *value = strtok_r(NULL, " \n\r", &saved_ptr);
 
         if (key == NULL || value == NULL)
         {
-            puts("[ERROR] Missing arguments. Usage set <key> <value>");
+            puts("Missing arguments. Usage set <key> <value>");
             return;
         }
 
@@ -219,15 +226,15 @@ void handle_command(Cli *cli, char *input)
         }
         else
         {
-            puts("[ERROR] Failed to set key (Out of Memory?)");
+            puts("Failed to set key (Out of Memory?)");
         }
     }
-    else if (strcmp(cmd, "get") == 0)
+    else if (strcmp(cmd, GET) == 0)
     {
         char *key = strtok_r(NULL, " \n\r", &saved_ptr);
         if (key == NULL)
         {
-            puts("[ERROR] Missing key argument. Usage get <key>");
+            puts("Missing key argument. Usage get <key>");
             return;
         }
 
@@ -241,12 +248,12 @@ void handle_command(Cli *cli, char *input)
             puts("404!");
         }
     }
-    else if (strcmp(cmd, "del") == 0)
+    else if (strcmp(cmd, DEL) == 0)
     {
         char *key = strtok_r(NULL, " \n\r", &saved_ptr);
         if (key == NULL)
         {
-            puts("[ERROR] Missing key argument. Usage del <key>");
+            puts("Missing key argument. Usage del <key>");
             return;
         }
 
@@ -262,7 +269,7 @@ void handle_command(Cli *cli, char *input)
     }
     else
     {
-        puts("[ERROR] Unknown command. Type 'help' for options.");
+        puts("Unknown command. Type 'help' for options.");
     }
 }
 
