@@ -91,11 +91,6 @@ int ShardSet(Shard *shard, const char *key, const char *value)
     int result = MapSet(shard->map, key, node);
     if (result == 0)
     {
-        return 1;
-    }
-
-    if (result == -1)
-    {
         node->next_node = shard->free_list;
         shard->free_list = node;
         return 0;

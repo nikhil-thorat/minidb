@@ -11,6 +11,11 @@ static Node *create_dummy_node(void)
 
 static void unlink_node(Node *node)
 {
+    if (node->prev_node == NULL || node->next_node == NULL)
+    {
+        return;
+    }
+
     Node *prev = node->prev_node;
     Node *next = node->next_node;
 
