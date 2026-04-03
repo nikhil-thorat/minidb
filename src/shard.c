@@ -25,7 +25,7 @@ Shard *NewShard(size_t capacity)
         }
         if (list != NULL)
         {
-            DestroyList(shard->list);
+            DestroyList(list);
         }
         if (pool != NULL)
         {
