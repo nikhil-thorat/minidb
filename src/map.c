@@ -6,6 +6,8 @@
 #include <string.h>
 #include <strings.h>
 
+#define MAP_MAX_LOAD_FACTOR 0.75
+
 static void MapRehash(Map *map)
 {
     Entry *new_table = (Entry *)calloc(map->capacity, sizeof(Entry));
@@ -62,7 +64,7 @@ int MapSet(Map *map, const char *key, Node *node)
         return -1;
     }
 
-    if ((map->size + map->tombstones) > (map->capacity * 0.75))
+    if ((map->size + map->tombstones) > (map->capacity * MAP_MAX_LOAD_FACTOR))
     {
         MapRehash(map);
     }

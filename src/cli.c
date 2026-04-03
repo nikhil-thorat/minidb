@@ -190,6 +190,7 @@ void handle_command(Cli *cli, char *input)
     {
         puts("Shutting down Database...");
         DestroyDatabase(cli->db);
+        free(cli);
         exit(EXIT_SUCCESS);
     }
     else if (strcmp(cmd, HELP) == 0)

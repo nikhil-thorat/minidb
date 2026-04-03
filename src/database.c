@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+static inline Shard *DatabaseGetShard(Database *db, const char *key)
+{
+    return db->shards[Hash(key) & (db->num_shards - 1)];
+}
+
 Database *NewDatabase(size_t num_shards, size_t shard_capacity)
 {
     Database *db = (Database *)malloc(sizeof(Database));
@@ -46,10 +51,8 @@ int DatabaseSet(Database *db, const char *key, const char *value)
         return 0;
     }
 
-    uint32_t hash = Hash(key);
-    size_t shard_index = hash & (db->num_shards - 1);
-
-    return ShardSet(db->shards[shard_index], key, value);
+    Shard *shard = DatabaseGetShard(db, key);
+    return ShardSet(shard, key, value);
 }
 
 char *DatabaseGet(Database *db, const char *key)
@@ -60,10 +63,8 @@ char *DatabaseGet(Database *db, const char *key)
         return NULL;
     }
 
-    uint32_t hash = Hash(key);
-    size_t shard_index = hash & (db->num_shards - 1);
-
-    return ShardGet(db->shards[shard_index], key);
+    Shard *shard = DatabaseGetShard(db, key);
+    return ShardGet(shard, key);
 }
 
 int DatabaseDelete(Database *db, const char *key)
@@ -73,10 +74,8 @@ int DatabaseDelete(Database *db, const char *key)
         return 0;
     }
 
-    uint32_t hash = Hash(key);
-    size_t shard_index = hash & (db->num_shards - 1);
-
-    return ShardDelete(db->shards[shard_index], key);
+    Shard *shard = DatabaseGetShard(db, key);
+    return ShardDelete(shard, key);
 }
 
 void DestroyDatabase(Database *db)

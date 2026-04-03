@@ -21,7 +21,7 @@ Shard *NewShard(size_t capacity)
     {
         if (map != NULL)
         {
-            DestroyMap(shard->map);
+            DestroyMap(map);
         }
         if (list != NULL)
         {
@@ -89,6 +89,11 @@ int ShardSet(Shard *shard, const char *key, const char *value)
     InitializeNode(node, key, value);
 
     int result = MapSet(shard->map, key, node);
+    if (result == 0)
+    {
+        return 1;
+    }
+
     if (result == -1)
     {
         node->next_node = shard->free_list;
