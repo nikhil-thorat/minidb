@@ -61,7 +61,7 @@ int MapSet(Map *map, const char *key, Node *node)
 {
     if (map->size >= map->capacity)
     {
-        return -1;
+        return 0;
     }
 
     if ((map->size + map->tombstones) > (map->capacity * MAP_MAX_LOAD_FACTOR))
@@ -106,14 +106,7 @@ int MapSet(Map *map, const char *key, Node *node)
             if (strcmp(existing_node->key, key) == 0)
             {
                 int result = UpdateNodeValue(existing_node, node->value);
-                if (result == 1)
-                {
-                    return 0;
-                }
-                else
-                {
-                    return -1;
-                }
+                return result;
             }
         }
 
@@ -129,7 +122,7 @@ int MapSet(Map *map, const char *key, Node *node)
         return 1;
     }
 
-    return -1;
+    return 0;
 }
 
 Node *MapGet(Map *map, const char *key)

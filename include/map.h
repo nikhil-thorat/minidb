@@ -26,10 +26,8 @@ Map *NewMap(size_t capacity);
 
 /*
  * Sets the given key and value in the Map.
- * Returns 1 if successfully inserted, 0 when
- * key's value is updated, -1 when failed to
- * Set the given key.
- */
+ * Returns 1 if successfully else 0.
+ * */
 int MapSet(Map *map, const char *key, Node *node);
 
 /*
