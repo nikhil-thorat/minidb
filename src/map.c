@@ -6,11 +6,10 @@
 #include <string.h>
 #include <strings.h>
 
-#define MAP_MAX_LOAD_FACTOR 0.75
-
 static void MapRehash(Map *map)
 {
     Entry *new_table = (Entry *)calloc(map->capacity, sizeof(Entry));
+    size_t size = 0;
 
     for (size_t i = 0; i < map->capacity; i++)
     {
@@ -27,12 +26,14 @@ static void MapRehash(Map *map)
 
             new_table[index].node = node;
             new_table[index].status = OCCUPIED;
+            size++;
         }
     }
 
     free(map->table);
     map->table = new_table;
     map->tombstones = 0;
+    map->size = size;
 }
 
 Map *NewMap(size_t capacity)
@@ -59,6 +60,12 @@ Map *NewMap(size_t capacity)
 
 int MapSet(Map *map, const char *key, Node *node)
 {
+
+    if (map == NULL || key == NULL || node == NULL)
+    {
+        return 0;
+    }
+
     if (map->size >= map->capacity)
     {
         return 0;
@@ -127,6 +134,10 @@ int MapSet(Map *map, const char *key, Node *node)
 
 Node *MapGet(Map *map, const char *key)
 {
+    if (map == NULL || key == NULL)
+    {
+        return NULL;
+    }
 
     uint32_t hash = Hash(key);
     uint32_t index = hash & (map->capacity - 1);
@@ -156,6 +167,11 @@ Node *MapGet(Map *map, const char *key)
 
 Node *MapDelete(Map *map, const char *key)
 {
+    if (map == NULL || key == NULL)
+    {
+        return NULL;
+    }
+
     uint32_t hash = Hash(key);
     uint32_t index = hash & (map->capacity - 1);
 

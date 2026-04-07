@@ -6,6 +6,10 @@
 static Node *create_dummy_node(void)
 {
     Node *dummy_node = (Node *)calloc(1, sizeof(Node));
+    if (dummy_node == NULL)
+    {
+        return NULL;
+    }
     return dummy_node;
 }
 
@@ -74,7 +78,7 @@ void ListAddToHead(List *list, Node *node)
 
 void ListMoveToHead(List *list, Node *node)
 {
-    if (node == NULL)
+    if (node == NULL || list == NULL)
     {
         return;
     };
@@ -103,7 +107,7 @@ Node *ListRemoveTail(List *list)
 
 Node *ListRemoveNode(List *list, Node *node)
 {
-    if (node == NULL)
+    if (node == NULL || list == NULL)
     {
         return NULL;
     }

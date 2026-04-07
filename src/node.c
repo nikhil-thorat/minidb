@@ -3,7 +3,7 @@
 
 void InitializeNode(Node *node, const char *key, const char *value)
 {
-    if (node == NULL)
+    if (node == NULL || key == NULL || value == NULL)
     {
         return;
     }

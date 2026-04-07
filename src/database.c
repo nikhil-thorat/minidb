@@ -6,6 +6,10 @@
 
 static inline Shard *DatabaseGetShard(Database *db, const char *key)
 {
+    if (db == NULL || key == NULL)
+    {
+        return NULL;
+    }
     return db->shards[Hash(key) & (db->num_shards - 1)];
 }
 

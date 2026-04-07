@@ -53,7 +53,7 @@ Shard *NewShard(size_t capacity)
 
 int ShardSet(Shard *shard, const char *key, const char *value)
 {
-    if (shard == NULL || key == NULL || value == NULL || key == NULL || value == NULL)
+    if (shard == NULL || key == NULL || value == NULL)
     {
         return 0;
     }

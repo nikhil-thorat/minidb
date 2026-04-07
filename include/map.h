@@ -4,6 +4,8 @@
 #include "entry.h"
 #include <stdlib.h>
 
+#define MAP_MAX_LOAD_FACTOR 0.75
+
 typedef struct Node Node;
 
 /*
