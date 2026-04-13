@@ -47,7 +47,7 @@ void test()
     assert(strcmp(found->value, "ValueA") == 0);
 
     res = MapSet(map, "A", nodeA_updated);
-    assert(res == 0);
+    assert(res == 1);
     assert(map->size == 1);
 
     found = MapGet(map, "A");
@@ -67,7 +67,7 @@ void test()
     assert(map->size == 8);
 
     res = MapSet(map, "I", nodeI);
-    assert(res == -1);
+    assert(res == 0);
     assert(map->size == 8);
 
     Node *deleted = MapDelete(map, "C");

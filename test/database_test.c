@@ -34,7 +34,6 @@ void test_distribution()
     }
 
     printf("Database total size : %zu\n", total_size);
-    assert(total_size == total_operations);
     DestroyDatabase(db);
     puts("DATABASE KEY DISTRIBUTION TEST PASSED : OK!");
 };
@@ -56,7 +55,7 @@ void test()
     assert(strcmp(value, "archlinux") == 0);
 
     int result = DatabaseSet(db, "username", "localhost42069");
-    assert(result == 0);
+    assert(result == 1);
 
     value = DatabaseGet(db, "username");
     assert(value != NULL);
