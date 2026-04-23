@@ -1,6 +1,6 @@
 ![MiniDb](public/minidb.png)
 
-# MiniDB
+# MiniDB (Embedded Database Engine)
 
 A blazing-fast, in-memory key-value database built entirely from scratch in C.
 
