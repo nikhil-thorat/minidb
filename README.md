@@ -1,69 +1,103 @@
 ![MiniDb](public/minidb.png)
 
-# MiniDB (Embedded Database Engine)
+# MiniDB
 
-A blazing-fast, in-memory key-value database built entirely from scratch in C.
+An embedded, in-memory key-value store written from scratch in C11.
 
-MiniDB is an embedded database engine designed to process millions of operations per second. It acts as an LRU (Least Recently Used) cache and relies on custom memory management, bitwise math, and an optimized hashing algorithm to achieve extreme hardware efficiency.
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![Language: C11](https://img.shields.io/badge/language-C11-blue.svg)
+![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen.svg)
 
-## Project Journey
+## About MiniDB
 
-This project was built from the ground up to deeply understand how production-grade systems like Redis and Memcached work under the hood. It wasn't just about making a data structure; it was about hunting down every single performance bottleneck from CPU cycles to OS-level memory locks and engineering a way around them.
+MiniDB is a small database that runs inside your program. It stores values under keys, finds them quickly, and keeps only the data that you use most often. It has no network layer and no external dependencies.
 
-Through consistent iteration, testing, and profiling, the engine evolved from a basic Hashmap that took **19 seconds to process a million keys**, into a multi-sharded architecture that handles them in just a few seconds.
+I built it to learn what happens inside systems like Redis and Memcached. Instead of reading about their design, I wrote a small engine from scratch and made the important choices myself.
 
-## Problems Faced & How I Solved Them
+## Journey
 
-Building a database from scratch revealed that theoretical code doesn't always translate to fast software. Here are the major architectural roadblocks I hit and how I solved them:
+The project started as a hash map, a table that finds a key quickly. It cannot decide what to evict when it is full. I added a linked list that tracks recent use. Then I combined both inside a shard, a small independent piece of the database. Each shard owns a table, a usage list, and a pool of ready-to-use nodes. The database routes each key to one shard, so each table stays small.
 
-### 1. The "Malloc Tax" (Memory Allocation Bottlenecks)
-* **The Problem:** Calling `malloc` and `free` for every single key insertion forced the database to constantly wait on the Operating System, killing performance.
-* **The Solution:** I built a **Memory Arena (Node Pool)**. The database pre-allocates one massive block of memory at startup. Nodes are recycled using a "Free List" stack, and strings are kept inline.
-**Result:** Zero OS-level memory allocations during normal read/write operations.
+Next came performance work. I changed the hash function and replaced an expensive division with a faster bitwise trick. I moved memory requests out of the normal read and write path. I also cleared old slots in bulk. The final step added the command-line interface and tests.
 
-### 2. Slow CPU Math & Hashing
-* **The Problem:** The standard **FNV-1a** hashing algorithm processed strings one byte at a time, and calculating array indexes using modulo division (`%`) was wasting valuable CPU cycles.
-* **The Solution:** I upgraded the hashing engine to **MurmurHash3** (processing data in 32-bit chunks) and replaced the slow division operator with a lightning-fast **Bitwise AND (`&`)** mask, enforcing a strict power-of-two capacity rule.
+## Result
 
-### 3. Tombstone Pollution (The Wasted Loops Bug)
-* **The Problem:** When the cache filled up, the LRU eviction policy worked, but it left "Deleted" markers (tombstones) everywhere. Eventually, the database had to loop through thousands of dead spots just to find a single key.
-* **The Solution:** I implemented a **Garbage Collection (Rehashing)** system. Whenever a shard reaches 75% capacity of active and dead data, it briefly pauses, creates a clean table, moves only the active keys, and wipes the garbage to guarantee $O(1)$ lookups.
+A simple idea became a working in-memory cache with clear behavior:
 
-### 4. Single-Thread Limitations
-* **The Problem:** A single massive database means only one process can safely write to it at a time.
-* **The Solution:** I architected the database to use **Multi-Sharding**. The core router hashes a key and assigns it to one of multiple independent shards. This keeps CPU cache sizes small and lays the exact groundwork needed for future concurrent lock-striping.
+- Fast average lookup, insert, and delete.
+- Immediate eviction of the least recently used key.
+- Normal reads and writes do not request new memory.
+- Sharded storage that keeps each table small.
+- A small command-line interface for manual testing.
 
-## Performance
+The design is a set of tradeoffs. Fixed-size keys and values avoid memory setup but limit input length. A fixed pool of nodes keeps memory use predictable but caps capacity. The engine is single-threaded, so it has no lock overhead but cannot serve concurrent writers.
 
-Because MiniDB operates as an embedded engine (bypassing the TCP/IP network tax) and utilizes aggressive memory pooling, it hits maximum hardware speeds.
+## Benchmark and Limitations
 
-Compiled with Clang (`-O3 -march=native -flto`), a standard stress test **Writing/Reading 50 Million key-value pairs** yields:
-* **Writes (Inserts):** ~1.2 Million Operations Per Second (OPS)
-* **Reads (Lookups):** ~2.8 Million Operations Per Second (OPS)
+Measured on my machine with clang and `-O3 -ffast-math -march=native -flto`. The `performance` command uses 4 shards with 4096 keys per shard.
 
-*(Tested safely with Clang AddressSanitizer and verified for zero memory leaks).*
+| Phase | Operations | Throughput |
+|---|---:|---:|
+| Insert | 50,000,000 | ~4.75 M ops/s |
+| Query | 50,000,000 | ~12.33 M ops/s |
+| Mixed | 20,000,000 | ~9.01 M ops/s |
 
-## Features
-* **Custom REPL CLI:** A blazing fast interactive command-line interface with built-in profiling.
-* **$O(1)$ LRU Eviction:** Automatically drops the oldest data when capacity is reached via a sentinelled Doubly Linked List.
-* **Thread-Safe Routing:** Uses `strtok_r` and independent shards to ensure clean data parsing.
-* **Zero Dependencies:** Built using standard **POSIX C**. No external libraries required.
+The table reports throughput in operations per second. The query test mostly asks for keys that are no longer there. The test database holds only 16,384 keys, so the inserts evict almost every key before the query phase.
 
-## Building and Running
+**Limitations:**
 
-**Requirements:** `clang` (recommended) or `gcc`, and `make`.
+- Single-threaded. The engine has no locks.
+- Fixed capacity per shard.
+- Keys stop at 31 characters and values at 63 characters.
+- No persistence, expiry, transactions, or network support.
+- Built with `-march=native`, so the binary depends on the build machine.
+
+## Project Structure
+
+```text
+include/                Public headers for each module.
+src/                    Implementation files.
+test/                   Standalone unit and stress tests.
+public/minidb.png       Project banner.
+docs/ARCHITECTURE.md    Detailed architecture reference.
+Makefile                Build and debug targets.
+LICENSE                 MIT license.
+```
+
+## Project Setup
+
+**Requirements:** `clang` (default) or `gcc`, and `make`.
 
 ```bash
-# Clone the repository
 git clone https://github.com/nikhil-thorat/minidb.git
 cd minidb
 
-# Build for maximum performance
+# Build for performance.
 make build
 
-# Run the CLI
-./build/minidb
+# Build with AddressSanitizer and no optimization.
+make debug
+
+# Run the existing build.
+make run
 ```
 
-Once inside the CLI, type `performance` to watch the database run a *50 Million key stress test* in real-time.
-**(Note : Test results can vary from hardware to hardware).**
+`make build` creates `build/minidb`. `make debug` creates `build/minidb_debug`. To use gcc, run `make build CC=gcc`.
+
+Basic commands inside the CLI:
+
+| Command | Action |
+|---|---|
+| `set <key> <value>` | Store a value. |
+| `get <key>` | Read a value. |
+| `del <key>` | Delete a key. |
+| `status` | Show database health and capacity. |
+| `performance` | Run the built-in benchmark. |
+| `help` | Show the command list. |
+| `exit` or `quit` | Leave the CLI. |
+
+Values cannot contain spaces. Keys stop at 31 characters and values stop at 63 characters.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
