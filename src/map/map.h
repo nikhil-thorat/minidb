@@ -13,12 +13,11 @@ typedef struct Node Node;
 /*
  * Represents Map of entries, contains capacity of the map,
  * current size of the map and a pointer to an array of slots.
- * Each slot is a tagged Node pointer (see entry.h).
+ * Each slot is a tagged Node pointer.
  */
 typedef struct Map {
   size_t capacity;
   size_t size;
-  size_t tombstones;
   Node** table;
 } Map;
 
@@ -42,7 +41,8 @@ int MapSet(Map* map, const char* key, uint32_t hash, Node* node);
 Node* MapGet(Map* map, const char* key, uint32_t hash);
 
 /*
- * Marks the slot of given key as DELETED
+ * Deletes the given key from the Map and closes the probe cluster.
+ * Returns the removed Node, or NULL if the key is not found.
  */
 Node* MapDelete(Map* map, const char* key, uint32_t hash);
 
