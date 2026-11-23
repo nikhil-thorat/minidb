@@ -1,6 +1,8 @@
 #ifndef NODE_H
 #define NODE_H
 
+#include <stdint.h>
+
 /*
  * Defining maximum lengths for key and value.
  */
@@ -15,6 +17,7 @@
 typedef struct Node {
   char key[MAX_KEY_LEN];
   char value[MAX_VALUE_LEN];
+  uint32_t hash;
   struct Node* prev_node;
   struct Node* next_node;
 } Node;

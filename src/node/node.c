@@ -13,6 +13,8 @@ void InitializeNode(Node* node, const char* key, const char* value) {
   memcpy(node->value, value, value_len);
   node->value[value_len] = '\0';
 
+  node->hash = 0;
+
   node->prev_node = NULL;
   node->next_node = NULL;
 }

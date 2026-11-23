@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../hash/hash.h"
 #include "../node/node.h"
 
 Shard* NewShard(size_t capacity) {
@@ -51,7 +50,7 @@ int ShardSet(Shard* shard, const char* key, uint32_t hash, const char* value) {
   if (shard->size >= shard->capacity) {
     Node* deleted_node = ListRemoveTail(shard->list);
     if (deleted_node != NULL) {
-      MapDelete(shard->map, deleted_node->key, Hash(deleted_node->key));
+      MapDelete(shard->map, deleted_node->key, deleted_node->hash);
       deleted_node->next_node = shard->free_list;
 
       shard->free_list = deleted_node;

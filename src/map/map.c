@@ -5,7 +5,6 @@
 #include <string.h>
 #include <strings.h>
 
-#include "../hash/hash.h"
 #include "../node/node.h"
 
 static void MapRehash(Map* map) {
@@ -16,7 +15,7 @@ static void MapRehash(Map* map) {
     if (map->table[i].status == OCCUPIED) {
       Node* node = map->table[i].node;
 
-      uint32_t hash = Hash(node->key);
+      uint32_t hash = node->hash;
       uint32_t index = hash & (map->capacity - 1);
 
       while (new_table[index].status == OCCUPIED) {
@@ -77,6 +76,7 @@ int MapSet(Map* map, const char* key, uint32_t hash, Node* node) {
       }
 
       map->table[target_index].node = node;
+      map->table[target_index].node->hash = hash;
       map->table[target_index].status = OCCUPIED;
       map->size++;
 
@@ -86,7 +86,7 @@ int MapSet(Map* map, const char* key, uint32_t hash, Node* node) {
     } else if (slot->status == OCCUPIED) {
       Node* existing_node = slot->node;
 
-      if (strcmp(existing_node->key, key) == 0) {
+      if (existing_node->hash == hash && strcmp(existing_node->key, key) == 0) {
         int result = UpdateNodeValue(existing_node, node->value);
         return result;
       }
@@ -97,6 +97,7 @@ int MapSet(Map* map, const char* key, uint32_t hash, Node* node) {
 
   if (first_deleted_index != -1) {
     map->table[first_deleted_index].node = node;
+    map->table[first_deleted_index].node->hash = hash;
     map->table[first_deleted_index].status = OCCUPIED;
     map->size++;
     map->tombstones--;
@@ -119,7 +120,7 @@ Node* MapGet(Map* map, const char* key, uint32_t hash) {
       return NULL;
     } else if (slot->status == OCCUPIED) {
       Node* node = slot->node;
-      if (strcmp(node->key, key) == 0) return node;
+      if (node->hash == hash && strcmp(node->key, key) == 0) return node;
     }
 
     index = (index + 1) & (map->capacity - 1);
@@ -140,7 +141,7 @@ Node* MapDelete(Map* map, const char* key, uint32_t hash) {
       return NULL;
     } else if (slot->status == OCCUPIED) {
       Node* node = slot->node;
-      if (strcmp(node->key, key) == 0) {
+      if (node->hash == hash && strcmp(node->key, key) == 0) {
         slot->status = DELETED;
         map->size--;
         map->tombstones++;
