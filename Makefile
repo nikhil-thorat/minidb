@@ -1,6 +1,6 @@
 CC = clang
 BASE_FLAGS = -std=c11 -Wall -Wextra -pedantic -D_POSIX_C_SOURCE=200809L
-SRC = src/*.c
+SRC := $(shell find src -type f -name '*.c')
 TARGET = build/minidb
 
 debug:

@@ -6,6 +6,6 @@
 /*
  * Hashes the given string
  */
-uint32_t Hash(const char *key);
+uint32_t Hash(const char* key);
 
-#endif
+#endif  // HASH_H
