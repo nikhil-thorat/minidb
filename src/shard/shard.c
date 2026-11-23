@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../hash/hash.h"
 #include "../node/node.h"
 
 Shard* NewShard(size_t capacity) {
@@ -41,7 +42,9 @@ Shard* NewShard(size_t capacity) {
 int ShardSet(Shard* shard, const char* key, const char* value) {
   if (shard == NULL || key == NULL || value == NULL) return 0;
 
-  Node* existing_node = MapGet(shard->map, key);
+  uint32_t hash = Hash(key);
+
+  Node* existing_node = MapGet(shard->map, key, hash);
   if (existing_node != NULL) {
     UpdateNodeValue(existing_node, value);
     ListMoveToHead(shard->list, existing_node);
@@ -51,7 +54,7 @@ int ShardSet(Shard* shard, const char* key, const char* value) {
   if (shard->size >= shard->capacity) {
     Node* deleted_node = ListRemoveTail(shard->list);
     if (deleted_node != NULL) {
-      MapDelete(shard->map, deleted_node->key);
+      MapDelete(shard->map, deleted_node->key, Hash(deleted_node->key));
       deleted_node->next_node = shard->free_list;
       shard->free_list = deleted_node;
       shard->size--;
@@ -65,7 +68,7 @@ int ShardSet(Shard* shard, const char* key, const char* value) {
 
   InitializeNode(node, key, value);
 
-  int result = MapSet(shard->map, key, node);
+  int result = MapSet(shard->map, key, hash, node);
   if (result == 0) {
     node->next_node = shard->free_list;
     shard->free_list = node;
@@ -80,7 +83,9 @@ int ShardSet(Shard* shard, const char* key, const char* value) {
 char* ShardGet(Shard* shard, const char* key) {
   if (shard == NULL || key == NULL) return NULL;
 
-  Node* node = MapGet(shard->map, key);
+  uint32_t hash = Hash(key);
+
+  Node* node = MapGet(shard->map, key, hash);
   if (node == NULL) return NULL;
 
   ListMoveToHead(shard->list, node);
@@ -90,7 +95,9 @@ char* ShardGet(Shard* shard, const char* key) {
 int ShardDelete(Shard* shard, const char* key) {
   if (shard == NULL || key == NULL) return 0;
 
-  Node* deleted_node = MapDelete(shard->map, key);
+  uint32_t hash = Hash(key);
+
+  Node* deleted_node = MapDelete(shard->map, key, hash);
   if (deleted_node == NULL) return 0;
 
   deleted_node = ListRemoveNode(shard->list, deleted_node);

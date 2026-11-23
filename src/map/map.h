@@ -1,6 +1,7 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "entry.h"
@@ -30,19 +31,19 @@ Map* NewMap(size_t capacity);
  * Sets the given key and value in the Map.
  * Returns 1 if successfully else 0.
  * */
-int MapSet(Map* map, const char* key, Node* node);
+int MapSet(Map* map, const char* key, uint32_t hash, Node* node);
 
 /*
  * Returns the Node of the given
  * key from the Map, else returns
  * NULL if key is not found.
  */
-Node* MapGet(Map* map, const char* key);
+Node* MapGet(Map* map, const char* key, uint32_t hash);
 
 /*
  * Marks the slot of given key as DELETED
  */
-Node* MapDelete(Map* map, const char* key);
+Node* MapDelete(Map* map, const char* key, uint32_t hash);
 
 /*
  * Frees the Maps internal table and the Map itself.

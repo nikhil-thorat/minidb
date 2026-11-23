@@ -15,6 +15,7 @@ static void MapRehash(Map* map) {
   for (size_t i = 0; i < map->capacity; i++) {
     if (map->table[i].status == OCCUPIED) {
       Node* node = map->table[i].node;
+
       uint32_t hash = Hash(node->key);
       uint32_t index = hash & (map->capacity - 1);
 
@@ -24,6 +25,7 @@ static void MapRehash(Map* map) {
 
       new_table[index].node = node;
       new_table[index].status = OCCUPIED;
+
       size++;
     }
   }
@@ -36,9 +38,7 @@ static void MapRehash(Map* map) {
 
 Map* NewMap(size_t capacity) {
   Map* new_map = (Map*)malloc(sizeof(Map));
-  if (new_map == NULL) {
-    return NULL;
-  }
+  if (new_map == NULL) return NULL;
 
   new_map->capacity = capacity;
   new_map->size = 0;
@@ -53,20 +53,15 @@ Map* NewMap(size_t capacity) {
   return new_map;
 }
 
-int MapSet(Map* map, const char* key, Node* node) {
-  if (map == NULL || key == NULL || node == NULL) {
-    return 0;
-  }
+int MapSet(Map* map, const char* key, uint32_t hash, Node* node) {
+  if (map == NULL || key == NULL || node == NULL) return 0;
 
-  if (map->size >= map->capacity) {
-    return 0;
-  }
+  if (map->size >= map->capacity) return 0;
 
   if ((map->size + map->tombstones) > (map->capacity * MAP_MAX_LOAD_FACTOR)) {
     MapRehash(map);
   }
 
-  uint32_t hash = Hash(key);
   uint32_t index = hash & (map->capacity - 1);
   int first_deleted_index = -1;
 
@@ -74,6 +69,7 @@ int MapSet(Map* map, const char* key, Node* node) {
     Entry* slot = &map->table[index];
     if (slot->status == EMPTY) {
       int target_index;
+
       if (first_deleted_index != -1) {
         target_index = first_deleted_index;
       } else {
@@ -83,13 +79,13 @@ int MapSet(Map* map, const char* key, Node* node) {
       map->table[target_index].node = node;
       map->table[target_index].status = OCCUPIED;
       map->size++;
+
       return 1;
     } else if (slot->status == DELETED) {
-      if (first_deleted_index == -1) {
-        first_deleted_index = index;
-      }
+      if (first_deleted_index == -1) first_deleted_index = index;
     } else if (slot->status == OCCUPIED) {
       Node* existing_node = slot->node;
+
       if (strcmp(existing_node->key, key) == 0) {
         int result = UpdateNodeValue(existing_node, node->value);
         return result;
@@ -104,18 +100,16 @@ int MapSet(Map* map, const char* key, Node* node) {
     map->table[first_deleted_index].status = OCCUPIED;
     map->size++;
     map->tombstones--;
+
     return 1;
   }
 
   return 0;
 }
 
-Node* MapGet(Map* map, const char* key) {
-  if (map == NULL || key == NULL) {
-    return NULL;
-  }
+Node* MapGet(Map* map, const char* key, uint32_t hash) {
+  if (map == NULL || key == NULL) return NULL;
 
-  uint32_t hash = Hash(key);
   uint32_t index = hash & (map->capacity - 1);
 
   for (size_t i = 0; i < map->capacity; i++) {
@@ -125,9 +119,7 @@ Node* MapGet(Map* map, const char* key) {
       return NULL;
     } else if (slot->status == OCCUPIED) {
       Node* node = slot->node;
-      if (strcmp(node->key, key) == 0) {
-        return node;
-      }
+      if (strcmp(node->key, key) == 0) return node;
     }
 
     index = (index + 1) & (map->capacity - 1);
@@ -136,12 +128,9 @@ Node* MapGet(Map* map, const char* key) {
   return NULL;
 }
 
-Node* MapDelete(Map* map, const char* key) {
-  if (map == NULL || key == NULL) {
-    return NULL;
-  }
+Node* MapDelete(Map* map, const char* key, uint32_t hash) {
+  if (map == NULL || key == NULL) return NULL;
 
-  uint32_t hash = Hash(key);
   uint32_t index = hash & (map->capacity - 1);
 
   for (size_t i = 0; i < map->capacity; i++) {
@@ -155,6 +144,7 @@ Node* MapDelete(Map* map, const char* key) {
         slot->status = DELETED;
         map->size--;
         map->tombstones++;
+
         return node;
       }
     }
@@ -165,9 +155,7 @@ Node* MapDelete(Map* map, const char* key) {
 }
 
 void DestroyMap(Map* map) {
-  if (map == NULL) {
-    return;
-  }
+  if (map == NULL) return;
 
   free(map->table);
   free(map);

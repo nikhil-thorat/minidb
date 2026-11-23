@@ -5,7 +5,16 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../src/hash/hash.h"
 #include "../src/node/node.h"
+
+static int TSet(Map* m, const char* k, Node* n) {
+  return MapSet(m, k, Hash(k), n);
+}
+
+static Node* TGet(Map* m, const char* k) { return MapGet(m, k, Hash(k)); }
+
+static Node* TDel(Map* m, const char* k) { return MapDelete(m, k, Hash(k)); }
 
 void test() {
   size_t capacity = 8;
@@ -39,52 +48,52 @@ void test() {
   Node* nodeI = &node_pool[9];
   InitializeNode(nodeI, "I", "ValueI");
 
-  int res = MapSet(map, "A", nodeA);
+  int res = TSet(map, "A", nodeA);
   assert(res == 1);
   assert(map->size == 1);
 
-  Node* found = MapGet(map, "A");
+  Node* found = TGet(map, "A");
   assert(found == nodeA);
   assert(strcmp(found->value, "ValueA") == 0);
 
-  res = MapSet(map, "A", nodeA_updated);
+  res = TSet(map, "A", nodeA_updated);
   assert(res == 1);
   assert(map->size == 1);
 
-  found = MapGet(map, "A");
+  found = TGet(map, "A");
   assert(found == nodeA);
   assert(strcmp(found->value, "ValueAUpdated") == 0);
 
-  found = MapGet(map, "Z");
+  found = TGet(map, "Z");
   assert(found == NULL);
 
-  MapSet(map, "B", nodeB);
-  MapSet(map, "C", nodeC);
-  MapSet(map, "D", nodeD);
-  MapSet(map, "E", nodeE);
-  MapSet(map, "F", nodeF);
-  MapSet(map, "G", nodeG);
-  MapSet(map, "H", nodeH);
+  TSet(map, "B", nodeB);
+  TSet(map, "C", nodeC);
+  TSet(map, "D", nodeD);
+  TSet(map, "E", nodeE);
+  TSet(map, "F", nodeF);
+  TSet(map, "G", nodeG);
+  TSet(map, "H", nodeH);
   assert(map->size == 8);
 
-  res = MapSet(map, "I", nodeI);
+  res = TSet(map, "I", nodeI);
   assert(res == 0);
   assert(map->size == 8);
 
-  Node* deleted = MapDelete(map, "C");
+  Node* deleted = TDel(map, "C");
   assert(deleted == nodeC);
   assert(map->size == 7);
 
-  found = MapGet(map, "C");
+  found = TGet(map, "C");
   assert(found == NULL);
 
-  found = MapGet(map, "H");
+  found = TGet(map, "H");
   assert(found == nodeH);
 
-  res = MapSet(map, "I", nodeI);
+  res = TSet(map, "I", nodeI);
   assert(res == 1);
   assert(map->size == 8);
-  found = MapGet(map, "I");
+  found = TGet(map, "I");
   assert(found == nodeI);
 
   DestroyMap(map);
