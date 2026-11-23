@@ -15,7 +15,7 @@ flowchart TD
     S0 --> M[Map]
     S0 --> L[List]
     S0 --> P[Node pool and free list]
-    M -->|Entry points to Node| N[Node]
+    M -->|slot points to Node| N[Node]
     L -->|prev and next links| N
     P -->|allocates and recycles| N
 ```
@@ -52,29 +52,21 @@ Shard
 
 ### Map
 
-The map is an open-addressed hash table. It stores entries in one array and uses linear probing for collisions.
+The map is an open-addressed hash table. It stores one slot per bucket in a single array and uses linear probing for collisions.
 
 ```text
 Map
   size_t capacity
   size_t size
-  size_t tombstones
-  Entry *table
+  Node **table
 ```
 
-```text
-Entry
-  Node *node
-  SlotStatus status
-```
+A slot is a tagged `Node` pointer, so each slot is one machine word:
 
-A slot has one of three states:
+- `NULL`: the slot is empty.
+- any other value: the slot is occupied and points to a live node.
 
-- `EMPTY`: the slot is free.
-- `OCCUPIED`: the slot points to a live node.
-- `DELETED`: the slot is a tombstone.
-
-A tombstone keeps a probe chain valid after a delete. The map rebuilds the table when live entries plus tombstones pass 75% of capacity. The rebuild uses the same capacity, moves the live entries into a clean table, and clears the tombstones.
+The slot stores the pointer directly instead of a separate status field. This halves the table size and keeps the probe array cache-friendly. A delete does not leave a tombstone. Instead, `MapDelete` closes the hole with backward-shift reinsertion: it moves later entries in the probe cluster back into the freed slot when their home slot lies outside the shifted range. This keeps every probe chain valid without any cleanup pass. Because the map is sized at twice the shard capacity and the shard evicts before the map fills, the live load factor stays at or below 0.5, so the table never needs to grow or rebuild.
 
 ### List
 
@@ -91,17 +83,20 @@ List
 
 ### Node
 
-A node holds one key and one value inline.
+A node holds one key and one value inline, plus a cached copy of its key hash.
 
 ```text
 Node
   char key[32]
   char value[64]
+  uint32_t hash
   Node *prev_node
   Node *next_node
 ```
 
-A live node has two links. The map entry points to the node, and the list links the node to its neighbors. A free node sits in the shard free list, and `next_node` becomes the free-list link.
+The cached `hash` is written when the node enters the map. Eviction and probe comparisons reuse it instead of recomputing the hash or running `strcmp` on every collision.
+
+A live node has two links. The map slot points to the node, and the list links the node to its neighbors. A free node sits in the shard free list, and `next_node` becomes the free-list link.
 
 ## How the Structures Work Together
 
@@ -113,7 +108,7 @@ A live node has two links. The map entry points to the node, and the list links 
 | List | Orders live nodes by recency. |
 | Node pool | Supplies and recycles node memory. |
 
-A live key has one node. The map entry references that node, and the list links that same node. The node pool owns the memory for every node.
+A live key has one node. The map slot references that node, and the list links that same node. The node pool owns the memory for every node.
 
 A free node is not in the map and not in the list. It exists only in the free list.
 
@@ -133,7 +128,7 @@ A read updates recency, so a recently read key survives longer.
 
 1. If the key exists, the shard updates the value and moves the node to the head.
 2. If the shard is full, it unlinks the tail node from the list.
-3. It deletes the tail key from the map. This leaves a tombstone.
+3. It deletes the tail key from the map, closing the probe cluster.
 4. It pushes the tail node to the free list.
 5. It pops a node from the free list.
 6. It writes the new key and value into the node.
@@ -147,7 +142,7 @@ The map finds the existing node. The shard writes the new value and moves the no
 
 ### Delete
 
-The map marks the entry as `DELETED`. The shard unlinks the node from the list and pushes it to the free list. The tombstone lets later probes continue past the deleted slot.
+The map removes the entry and shifts the rest of the probe cluster back to close the hole. The shard unlinks the node from the list and pushes it to the free list.
 
 ### Eviction
 
@@ -164,11 +159,13 @@ This makes eviction O(1). The engine does not scan for a victim.
 
 Both counts must be powers of two. The router does not rebalance keys. A shard can become full and evict while another shard has free space.
 
+The database computes the hash once per operation and passes it down to the shard, which passes it to the map. The node also caches its key hash, so eviction and probe comparisons do not recompute it.
+
 ## Memory Model
 
 Each shard allocates one block of nodes at startup. The shard links the nodes into a free list and recycles them during normal operation. The normal set, get, and delete paths do not call `malloc` or `free`.
 
-Each shard allocates its map table at creation. A tombstone rebuild allocates a new table and frees the old one. The list allocates only its two sentinels.
+Each shard allocates its map table once at creation. Deletes shift entries in place, so the map never allocates or frees during normal operation. The list allocates only its two sentinels.
 
 The shard pool owns the nodes, so the list and the map never free individual nodes. On destroy, the shard frees the map, the list sentinels, the node pool, and the shard.
 
@@ -178,12 +175,22 @@ The shard pool owns the nodes, so the list and the map never free individual nod
 |---|---|---|
 | Insert | O(1) | O(map capacity) |
 | Lookup | O(1) | O(map capacity) |
-| Delete | O(1) | O(map capacity) |
+| Delete (cluster shift) | O(1) | O(map capacity) |
 | LRU update | O(1) | O(1) |
 | Eviction | O(1) | O(1) |
-| Tombstone rebuild | O(map capacity) | O(map capacity) |
 
-The average case assumes a good hash distribution and a load factor below 0.75.
+The average case assumes a good hash distribution and a load factor at or below 0.5.
+
+## Performance Notes
+
+Several choices keep the hot paths small:
+
+- The hash is computed once per operation and reused for shard selection and the map lookup.
+- Each node caches its hash, so eviction and probe comparisons avoid recomputation and skip `strcmp` on most collisions.
+- A map slot is one machine word, so the probe array stays within cache.
+- Deletes use backward-shift reinsertion instead of tombstones, so there is no periodic table rebuild.
+- Keys and values are copied with a bounded `memcpy`, not a full-buffer `strncpy`.
+- A read that hits the most recently used node does not relink the list.
 
 ## Concurrency
 

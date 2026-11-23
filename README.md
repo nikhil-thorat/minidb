@@ -18,31 +18,32 @@ I built it to learn what happens inside systems like Redis and Memcached. Instea
 
 The project started as a hash map, a table that finds a key quickly. It cannot decide what to evict when it is full. I added a linked list that tracks recent use. Then I combined both inside a shard, a small independent piece of the database. Each shard owns a table, a usage list, and a pool of ready-to-use nodes. The database routes each key to one shard, so each table stays small.
 
-Next came performance work. I changed the hash function and replaced an expensive division with a faster bitwise trick. I moved memory requests out of the normal read and write path. I also cleared old slots in bulk. The final step added the command-line interface and tests.
+Next came performance work. I changed the hash function and replaced an expensive division with a faster bitwise trick. I moved memory requests out of the normal read and write path. Later I removed redundant hashing, shrank each table slot to a single word, and replaced tombstone cleanup with backward-shift deletion. The final step added the command-line interface and tests.
 
 ## Result
 
 A simple idea became a working in-memory cache with clear behavior:
 
 - Fast average lookup, insert, and delete.
+- One hash computation per operation, with the hash cached on each node.
 - Immediate eviction of the least recently used key.
 - Normal reads and writes do not request new memory.
-- Sharded storage that keeps each table small.
+- Compact one-word map slots and sharded storage that keep each table small.
 - A small command-line interface for manual testing.
 
 The design is a set of tradeoffs. Fixed-size keys and values avoid memory setup but limit input length. A fixed pool of nodes keeps memory use predictable but caps capacity. The engine is single-threaded, so it has no lock overhead but cannot serve concurrent writers.
 
 ## Benchmark and Limitations
 
-Measured on my machine with clang and `-O3 -ffast-math -march=native -flto`. The `performance` command uses 4 shards with 4096 keys per shard.
+Measured on my machine with clang and `-O3 -ffast-math -march=native -flto`. The `performance` command uses 2 shards with 1,024 keys per shard.
 
 | Phase | Operations | Throughput |
 |---|---:|---:|
-| Insert | 50,000,000 | ~4.75 M ops/s |
-| Query | 50,000,000 | ~12.33 M ops/s |
-| Mixed | 20,000,000 | ~9.01 M ops/s |
+| Insert | 50,000,000 | ~9.16 M ops/s |
+| Query | 50,000,000 | ~23.89 M ops/s |
+| Mixed | 20,000,000 | ~17.43 M ops/s |
 
-The table reports throughput in operations per second. The query test mostly asks for keys that are no longer there. The test database holds only 16,384 keys, so the inserts evict almost every key before the query phase.
+The table reports throughput in operations per second. The query test mostly asks for keys that are no longer there. The test database holds only 2,048 keys, so the inserts evict almost every key before the query phase.
 
 **Limitations:**
 
