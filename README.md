@@ -56,8 +56,15 @@ The table reports throughput in operations per second. The query test mostly ask
 ## Project Structure
 
 ```text
-include/                Public headers for each module.
-src/                    Implementation files.
+src/
+  main.c                Entry point; creates the database and runs the CLI.
+  database/             Routes keys to shards; public Database API.
+  shard/                Map + LRU list + node pool for one partition.
+  map/                  Open-addressed hash table with backward-shift delete.
+  list/                 Sentinelled doubly linked LRU list.
+  node/                 Fixed-size key/value node with cached hash.
+  hash/                 MurmurHash3 (32-bit).
+  cli/                  Interactive command-line interface.
 test/                   Standalone unit and stress tests.
 public/minidb.png       Project banner.
 docs/ARCHITECTURE.md    Detailed architecture reference.
