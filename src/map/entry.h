@@ -4,34 +4,18 @@
 typedef struct Node Node;
 
 /*
- * Represents the Slot status of the Entry
- * EMPTY = 0
- * OCCUPIED = 1
- * DELETED = 2
+ * Slot encoding for the open-addressed table:
+ *   NULL      -> EMPTY
+ *   (Node*)1  -> DELETED (tombstone)
+ *   other     -> OCCUPIED (live Node pointer)
+ *
+ * Pool Node pointers are at least 8-byte aligned, so they never equal 1.
  */
-typedef enum {
-  EMPTY = 0,
-  OCCUPIED,
-  DELETED,
-} SlotStatus;
+#define SLOT_EMPTY ((Node*)0)
+#define SLOT_DELETED ((Node*)1)
 
-/*
- * Represents the Entry in the map
- * Contains pointer to the Node and status of the slot
- */
-typedef struct Entry {
-  Node* node;
-  SlotStatus status;
-} Entry;
-
-/*
- * Initializes Entry for the Map
- */
-void InitEntry(Entry* entry);
-
-/*
- * Free's the memory occupied by the Entry
- */
-void FreeEntry(Entry* entry);
+#define SLOT_IS_EMPTY(s) ((s) == SLOT_EMPTY)
+#define SLOT_IS_DELETED(s) ((s) == SLOT_DELETED)
+#define SLOT_IS_OCCUPIED(s) (!SLOT_IS_EMPTY(s) && !SLOT_IS_DELETED(s))
 
 #endif  // ENTRY_H

@@ -11,14 +11,15 @@
 typedef struct Node Node;
 
 /*
- * Represents Map of entiries, contains capacity of the map,
- * current size of the map and a pointer to an array of Entry struct
+ * Represents Map of entries, contains capacity of the map,
+ * current size of the map and a pointer to an array of slots.
+ * Each slot is a tagged Node pointer (see entry.h).
  */
 typedef struct Map {
   size_t capacity;
   size_t size;
   size_t tombstones;
-  Entry* table;
+  Node** table;
 } Map;
 
 /*
