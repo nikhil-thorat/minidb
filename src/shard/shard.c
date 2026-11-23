@@ -1,6 +1,5 @@
 #include "shard.h"
 
-#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,10 +38,8 @@ Shard* NewShard(size_t capacity) {
   return shard;
 }
 
-int ShardSet(Shard* shard, const char* key, const char* value) {
+int ShardSet(Shard* shard, const char* key, uint32_t hash, const char* value) {
   if (shard == NULL || key == NULL || value == NULL) return 0;
-
-  uint32_t hash = Hash(key);
 
   Node* existing_node = MapGet(shard->map, key, hash);
   if (existing_node != NULL) {
@@ -56,6 +53,7 @@ int ShardSet(Shard* shard, const char* key, const char* value) {
     if (deleted_node != NULL) {
       MapDelete(shard->map, deleted_node->key, Hash(deleted_node->key));
       deleted_node->next_node = shard->free_list;
+
       shard->free_list = deleted_node;
       shard->size--;
     }
@@ -72,18 +70,18 @@ int ShardSet(Shard* shard, const char* key, const char* value) {
   if (result == 0) {
     node->next_node = shard->free_list;
     shard->free_list = node;
+
     return 0;
   }
 
   ListAddToHead(shard->list, node);
   shard->size++;
+
   return 1;
 }
 
-char* ShardGet(Shard* shard, const char* key) {
+char* ShardGet(Shard* shard, const char* key, uint32_t hash) {
   if (shard == NULL || key == NULL) return NULL;
-
-  uint32_t hash = Hash(key);
 
   Node* node = MapGet(shard->map, key, hash);
   if (node == NULL) return NULL;
@@ -92,10 +90,8 @@ char* ShardGet(Shard* shard, const char* key) {
   return node->value;
 }
 
-int ShardDelete(Shard* shard, const char* key) {
+int ShardDelete(Shard* shard, const char* key, uint32_t hash) {
   if (shard == NULL || key == NULL) return 0;
-
-  uint32_t hash = Hash(key);
 
   Node* deleted_node = MapDelete(shard->map, key, hash);
   if (deleted_node == NULL) return 0;
@@ -106,6 +102,7 @@ int ShardDelete(Shard* shard, const char* key) {
   deleted_node->next_node = shard->free_list;
   shard->free_list = deleted_node;
   shard->size--;
+
   return 1;
 }
 

@@ -1,6 +1,7 @@
 #ifndef SHARD_H
 #define SHARD_H
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "../list/list.h"
@@ -31,19 +32,19 @@ Shard* NewShard(size_t capacity);
  * Set's the given key and value in the Shard.
  * Returns 1 if successful, else 0
  */
-int ShardSet(Shard* shard, const char* key, const char* value);
+int ShardSet(Shard* shard, const char* key, uint32_t hash, const char* value);
 
 /*
  * Return's the pointer to the value of the given
  * key if it exists in the Shard.
  */
-char* ShardGet(Shard* shard, const char* key);
+char* ShardGet(Shard* shard, const char* key, uint32_t hash);
 
 /*
  * Delete's the key-value from the Shard if it exits
  * in the Shard. Returns 1 if deleted, else 0
  */
-int ShardDelete(Shard* shard, const char* key);
+int ShardDelete(Shard* shard, const char* key, uint32_t hash);
 
 /*
  * Delete's everything in the Shard and free's the memory

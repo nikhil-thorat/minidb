@@ -6,9 +6,9 @@
 
 #include "../hash/hash.h"
 
-static inline Shard* DatabaseGetShard(Database* db, const char* key) {
-  if (db == NULL || key == NULL) return NULL;
-  return db->shards[Hash(key) & (db->num_shards - 1)];
+static inline Shard* DatabaseGetShard(Database* db, uint32_t hash) {
+  if (db == NULL) return NULL;
+  return db->shards[hash & (db->num_shards - 1)];
 }
 
 Database* NewDatabase(size_t num_shards, size_t shard_capacity) {
@@ -41,22 +41,28 @@ Database* NewDatabase(size_t num_shards, size_t shard_capacity) {
 int DatabaseSet(Database* db, const char* key, const char* value) {
   if (db == NULL || key == NULL || value == NULL) return 0;
 
-  Shard* shard = DatabaseGetShard(db, key);
-  return ShardSet(shard, key, value);
+  uint32_t hash = Hash(key);
+
+  Shard* shard = DatabaseGetShard(db, hash);
+  return ShardSet(shard, key, hash, value);
 }
 
 char* DatabaseGet(Database* db, const char* key) {
   if (db == NULL || key == NULL) return NULL;
 
-  Shard* shard = DatabaseGetShard(db, key);
-  return ShardGet(shard, key);
+  uint32_t hash = Hash(key);
+
+  Shard* shard = DatabaseGetShard(db, hash);
+  return ShardGet(shard, key, hash);
 }
 
 int DatabaseDelete(Database* db, const char* key) {
   if (db == NULL || key == NULL) return 0;
 
-  Shard* shard = DatabaseGetShard(db, key);
-  return ShardDelete(shard, key);
+  uint32_t hash = Hash(key);
+
+  Shard* shard = DatabaseGetShard(db, hash);
+  return ShardDelete(shard, key, hash);
 }
 
 void DestroyDatabase(Database* db) {

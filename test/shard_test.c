@@ -4,6 +4,14 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../src/hash/hash.h"
+
+static int SSet(Shard* s, const char* k, const char* v) {
+  return ShardSet(s, k, Hash(k), v);
+}
+static char* SGet(Shard* s, const char* k) { return ShardGet(s, k, Hash(k)); }
+static int SDel(Shard* s, const char* k) { return ShardDelete(s, k, Hash(k)); }
+
 void test_million_keys() {
   size_t capacity = 1024;
   Shard* shard = NewShard(capacity);
@@ -18,23 +26,23 @@ void test_million_keys() {
     char key[20];
     snprintf(key, sizeof(key), "%d", i);
 
-    int result = ShardSet(shard, key, value);
+    int result = SSet(shard, key, value);
     assert(result == 1);
   }
 
   assert(shard->size == capacity);
   assert(shard->list->size == capacity);
 
-  assert(ShardGet(shard, "0") == NULL);
-  assert(ShardGet(shard, "500000") == NULL);
-  assert(ShardGet(shard, "998975") == NULL);
+  assert(SGet(shard, "0") == NULL);
+  assert(SGet(shard, "500000") == NULL);
+  assert(SGet(shard, "998975") == NULL);
 
   int remaining_keys = total_operations - capacity;
   for (int i = remaining_keys; i < total_operations; i++) {
     char key[20];
     snprintf(key, sizeof(key), "%d", i);
 
-    char* result = ShardGet(shard, key);
+    char* result = SGet(shard, key);
     assert(result != NULL);
     assert(strcmp(result, value) == 0);
   }
@@ -54,7 +62,7 @@ void test() {
   for (int i = 0; i < capacity; i++) {
     char key[20];
     snprintf(key, sizeof(key), "%d", i);
-    int result = ShardSet(shard, key, value);
+    int result = SSet(shard, key, value);
     assert(result == 1);
   }
 
@@ -63,14 +71,14 @@ void test() {
   for (int i = 0; i < capacity; i++) {
     char key[20];
     snprintf(key, sizeof(key), "%d", i);
-    char* result = ShardGet(shard, key);
+    char* result = SGet(shard, key);
     assert(strcmp(result, value) == 0);
   }
 
   for (int i = 0; i < capacity; i++) {
     char key[20];
     snprintf(key, sizeof(key), "%d", i);
-    int result = ShardDelete(shard, key);
+    int result = SDel(shard, key);
     assert(result == 1);
   }
 
