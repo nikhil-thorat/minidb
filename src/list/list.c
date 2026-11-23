@@ -63,6 +63,8 @@ void ListAddToHead(List* list, Node* node) {
 void ListMoveToHead(List* list, Node* node) {
   if (node == NULL || list == NULL) return;
 
+  if (list->head->next_node == node) return;
+
   unlink_node(node);
   list->size--;
 
