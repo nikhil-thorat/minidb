@@ -151,7 +151,7 @@ void run_performance_test(void) {
   clock_t end = clock();
   time_spent = (double)(end - start) / CLOCKS_PER_SEC;
 
-  puts("Performance Test Completed");
+  puts("Performance Test Completed : OK!");
   printf("Time Taken : %.3f seconds for %d operations\n", time_spent,
          operations);
   printf("Operations Speed : %.0f operations per second\n",
